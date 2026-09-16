@@ -454,7 +454,7 @@ button { font-family: inherit; cursor: pointer; }
 .tool-box h4 { margin: 0 0 6px; color: var(--gold, #e6b84c); }
 .tool-box .muted { font-size: .85rem; }
 .tool-row { display: flex; gap: 10px; margin: 10px 0; flex-wrap: wrap; }
-.tool-row input {
+.tool-row input, .tool-row select {
   flex: 1; min-width: 180px;
   background: rgba(0,0,0,.3); color: inherit;
   border: 1px solid var(--line, rgba(230,184,76,.25));
