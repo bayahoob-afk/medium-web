@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>ห้องหมอดู AI — Medium</title>
+  <title>ห้องหมอดูทิพย์ — Medium</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔮</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -17,8 +17,8 @@
   <!-- STEP 1: เลือกองค์ -->
   <section class="section container" id="step-select">
     <div class="section-head">
-      <h2>🕯️ ห้องหมอดู AI — เลือก<span class="em">องค์</span>ที่ต้องการเข้าเฝ้า</h2>
-      <p>หมอดู AI แต่ละองค์ถูกสร้างจากการศึกษาศาสตร์ความเชื่อจริง
+      <h2>🕯️ ห้องหมอดูทิพย์ — เลือก<span class="em">องค์</span>ที่ต้องการเข้าเฝ้า</h2>
+      <p>หมอดูทิพย์แต่ละองค์ถูกสร้างจากการศึกษาศาสตร์ความเชื่อจริง
         ทั้งตำนาน ของไหว้ คาถา และข้อห้าม — พร้อมให้คำปรึกษาตลอด 24 ชั่วโมง</p>
     </div>
     <div class="grid grid-4" id="persona-grid"></div>
@@ -35,12 +35,12 @@
   <!-- STEP 3: ห้องสนทนา -->
   <section class="section container" id="step-chat" hidden>
     <div class="section-head">
-      <h2 id="chat-title">หมอดู AI</h2>
+      <h2 id="chat-title">หมอดูทิพย์</h2>
       <p id="chat-sub"></p>
     </div>
     <div class="medium-layout">
       <div class="chat-panel medium-chat">
-        <div class="chat-head" id="chat-head">💬 สนทนากับหมอดู AI</div>
+        <div class="chat-head" id="chat-head">💬 สนทนากับหมอดูทิพย์</div>
         <div class="chat-body" id="m-chat-body"></div>
         <div class="quick-chips" id="quick-chips"></div>
         <div class="chat-input-row">
@@ -238,7 +238,7 @@
     // ---------- แชร์คำทำนาย (viral loop) ----------
     let lastAnswer = "";
     document.getElementById("btn-share").onclick = async () => {
-      const text = `🔮 คำทำนายจาก${P ? P.name : "หมอดู AI Medium"}\n\n${lastAnswer || "ลองถามองค์ท่านดูก่อนนะ"}\n\n— ดูดวงกับหมอดู AI ได้ที่ ${location.origin + location.pathname}`;
+      const text = `🔮 คำทำนายจาก${P ? P.name : "หมอดูทิพย์ Medium"}\n\n${lastAnswer || "ลองถามองค์ท่านดูก่อนนะ"}\n\n— ดูดวงกับหมอดูทิพย์ได้ที่ ${location.origin + location.pathname}`;
       try {
         if (navigator.share) { await navigator.share({ text }); return; }
         await navigator.clipboard.writeText(text);

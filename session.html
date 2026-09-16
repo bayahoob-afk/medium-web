@@ -24,7 +24,7 @@
         <div class="consent-item"><span class="ci">🎬</span>
           <span>วิดีโอจะถูกบันทึกตลอดเซสชัน เพื่อให้คุณ<b>ดูย้อนหลังได้ไม่จำกัด</b>ภายใน 1 ปี</span></div>
         <div class="consent-item"><span class="ci">🤖</span>
-          <span>AI จะถอดเสียงบทสนทนาเพื่อสร้าง<b>สรุปคำทำนาย</b>ส่งให้คุณหลังจบเซสชันทันที</span></div>
+          <span>ระบบอัตโนมัติจะถอดเสียงบทสนทนาเพื่อสร้าง<b>สรุปคำทำนาย</b>ส่งให้คุณหลังจบเซสชันทันที</span></div>
         <div class="consent-item"><span class="ci">🔒</span>
           <span>วิดีโอเข้าถึงได้เฉพาะคุณและหมอดูคู่สนทนาเท่านั้น และคุณ<b>ขอลบได้ทุกเมื่อ</b></span></div>
         <div class="consent-item"><span class="ci">🚫</span>
@@ -282,7 +282,7 @@
         <div class="report-sec"><h4>🗓️ นัดหมายแนะนำ</h4>
           <p class="muted" style="font-size:.9rem">หมอดูแนะนำให้กลับมาอัปเดตดวงอีกครั้งใน 3 เดือน — กดจองล่วงหน้ารับส่วนลด 10%</p></div>
         <p class="muted" style="font-size:.78rem;border-top:1px dashed var(--line);padding-top:12px;margin-top:14px">
-          สรุปนี้สร้างโดย AI จากการถอดเสียงเซสชันจริง เพื่อความบันเทิงและเป็นแนวทางเท่านั้น</p>`;
+          สรุปนี้สร้างโดยระบบอัตโนมัติ จากการถอดเสียงเซสชันจริง เพื่อความบันเทิงและเป็นแนวทางเท่านั้น</p>`;
       document.getElementById("report").innerHTML = mockReport;
 
       // ถ้ามี backend AI: ให้ Claude API สรุปจากบทสนทนาจริงของเซสชันนี้แทน
@@ -297,7 +297,7 @@
         }).then(r => r.json()).then(data => {
           if (!data.summary) return;
           document.getElementById("report").innerHTML = `
-            <h3>📋 สรุปคำทำนาย <span class="badge badge-gold">สรุปโดย AI จากบทสนทนาจริง</span></h3>
+            <h3>📋 สรุปคำทำนาย <span class="badge badge-gold">สรุปอัตโนมัติจากบทสนทนาจริง</span></h3>
             <div class="meta">${metaLine}</div>
             <div class="report-sec" style="white-space:pre-line;color:var(--text-dim);font-size:.95rem">${escapeHtml(data.summary)}</div>`;
           summaryText = [
@@ -320,7 +320,7 @@
         "",
         "สิ่งที่ควรระวัง:", ...watch.map(w => "  • " + w),
         "",
-        "หมายเหตุ: สรุปนี้สร้างโดย AI เพื่อความบันเทิงและเป็นแนวทางเท่านั้น",
+        "หมายเหตุ: สรุปนี้สร้างโดยระบบอัตโนมัติ เพื่อความบันเทิงและเป็นแนวทางเท่านั้น",
         "ดูวิดีโอย้อนหลังได้ในแอป Medium ภายใน 1 ปี"
       ].join("\n");
     }
