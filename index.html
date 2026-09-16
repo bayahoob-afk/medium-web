@@ -45,6 +45,13 @@
 <body data-page="home">
   <header class="nav" id="app-nav"></header>
 
+  <!-- ดวงประจำวัน (โปรไฟล์ดวง + streak — ข้อมูลอยู่ในเครื่องผู้ใช้เท่านั้น) -->
+  <section class="section container" style="padding-bottom:0">
+    <div class="card" id="daily-card" style="text-align:left">
+      <div id="daily-body"></div>
+    </div>
+  </section>
+
   <!-- HERO -->
   <section class="hero container">
     <h1>ดูดวงกับหมอดูตัวจริง<br><span class="grad">มีคลิปย้อนหลัง + สรุปคำทำนาย</span> ให้ทุกครั้ง</h1>
@@ -153,6 +160,58 @@
   <script src="data/seers.js"></script>
   <script src="data/personas.js"></script>
   <script src="assets/js/app.js"></script>
+  <script src="assets/js/daily.js"></script>
+  <script>
+    // ---------- การ์ดดวงประจำวัน ----------
+    const dailyBody = document.getElementById("daily-body");
+    function renderDaily() {
+      const D = window.MEDIUM_DAILY;
+      const profile = D.getProfile();
+      const f = D.buildDaily();
+      const chk = D.checkin();
+      const streakBadge = `<span class="badge badge-gold">🔥 เช็คดวงต่อเนื่อง ${chk.streak} วัน</span>`;
+      const milestone = chk.milestone ? `<p class="gold" style="margin:8px 0 0">${chk.milestone}</p>` : "";
+      const profileRow = profile && profile.dob
+        ? `<span class="muted" style="font-size:.8rem">ดวงเฉพาะของ${profile.name ? " " + escapeHtml(profile.name) : "คุณ"} (วันเกิด ${profile.dob.split("-").reverse().join("/")})
+             · <a href="#" id="daily-clear" class="gold">ลบข้อมูลของฉัน</a></span>`
+        : `<span class="muted" style="font-size:.8rem">ใส่วันเกิดเพื่อรับดวงเฉพาะคุณ — เก็บในเครื่องคุณเท่านั้น ไม่ส่งไปที่ใด</span>
+           <span class="tool-row" style="margin-top:8px;display:flex">
+             <input type="date" id="daily-dob" style="flex:1;min-width:150px;background:rgba(0,0,0,.3);color:inherit;border:1px solid var(--line);border-radius:10px;padding:8px 12px;font:inherit">
+             <button class="btn btn-gold btn-sm" id="daily-save">รับดวงของฉัน</button>
+           </span>`;
+      dailyBody.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+          <h3 style="margin:0">🗓️ ดวงประจำวัน${f.personalized ? "ของคุณ" : "นี้"} — วัน${f.dayInfo.d}</h3>
+          ${streakBadge}
+        </div>
+        <p style="margin:10px 0 4px">💰 <b>การเงิน:</b> ${f.money}</p>
+        <p style="margin:4px 0">💗 <b>ความรัก:</b> ${f.love}</p>
+        <p style="margin:4px 0 10px">🍀 <b>โชคลาภ:</b> ${f.luck}</p>
+        <p class="muted" style="margin:0 0 6px;font-size:.9rem">
+          🎨 สีมงคลวันนี้: <b>${f.dayInfo.lucky}</b> · สีที่ควรเลี่ยง: ${f.dayInfo.avoid} · 🔢 เลขนำโชค: <b>${f.luckyNum}</b> (${f.dayInfo.star})</p>
+        ${f.zodiacNote ? `<p class="muted" style="margin:0 0 6px;font-size:.9rem">${f.zodiacNote}</p>` : ""}
+        ${milestone}
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;align-items:center">
+          <a class="btn btn-purple btn-sm" href="medium.html">🕯️ ถามต่อกับหมอดูทิพย์</a>
+          <a class="btn btn-gold btn-sm" href="seers.html">🔍 จองหมอดูตัวจริง</a>
+        </div>
+        <div style="margin-top:10px">${profileRow}</div>`;
+      const saveBtn = document.getElementById("daily-save");
+      if (saveBtn) saveBtn.onclick = () => {
+        const dob = document.getElementById("daily-dob").value;
+        if (!dob) return;
+        D.saveProfile({ dob });
+        renderDaily();
+      };
+      const clearBtn = document.getElementById("daily-clear");
+      if (clearBtn) clearBtn.onclick = (e) => {
+        e.preventDefault();
+        D.clearAll();
+        renderDaily();
+      };
+    }
+    renderDaily();
+  </script>
   <script>
     // หมอดูแนะนำ: เรตติ้งสูงสุด 3 คน
     const feat = [...window.SEERS].sort((a, b) => b.rating - a.rating).slice(0, 3);

@@ -53,14 +53,30 @@
     </div>
     <div class="tc mt-3" style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
       <button class="btn btn-ghost" id="btn-share">📤 แชร์คำทำนาย</button>
+      <button class="btn btn-ghost" id="btn-journal-save">💾 บันทึกลงสมุด</button>
+      <button class="btn btn-ghost" id="btn-journal">📖 สมุดคำทำนาย</button>
       <button class="btn btn-ghost" id="btn-leave">🙏 กราบลา / จบการสนทนา</button>
     </div>
   </section>
+
+  <!-- สมุดคำทำนาย (เก็บในเครื่องผู้ใช้เท่านั้น) -->
+  <div class="modal-backdrop" id="journal-modal" hidden>
+    <div class="modal">
+      <button class="close-x" id="journal-close">✕</button>
+      <h3>📖 สมุดคำทำนายของฉัน</h3>
+      <p class="muted" style="font-size:.85rem">เก็บในเครื่องของคุณเท่านั้น (สูงสุด 50 รายการ) — กลับมาติ๊กได้ว่าคำทำนายไหน "ตรง"</p>
+      <div id="journal-list"></div>
+      <div class="tc mt-2">
+        <button class="btn btn-ghost btn-sm" id="journal-clear">🗑️ ล้างสมุดทั้งเล่ม</button>
+      </div>
+    </div>
+  </div>
 
   <footer class="footer" id="app-footer"></footer>
 
   <script src="data/personas.js"></script>
   <script src="assets/js/app.js"></script>
+  <script src="assets/js/journal.js"></script>
   <script>
     const personas = window.MEDIUM_PERSONAS || [];
     const grid = document.getElementById("persona-grid");
@@ -531,6 +547,34 @@
     document.getElementById("quick-chips").addEventListener("click", e => {
       const c = e.target.closest(".chip");
       if (c) ask(c.dataset.q);
+    });
+
+    // ---------- สมุดคำทำนาย ----------
+    const journalModal = document.getElementById("journal-modal");
+    const journalList = document.getElementById("journal-list");
+    document.getElementById("btn-journal-save").onclick = () => {
+      if (!lastAnswer) { addMsg("ระบบ: ยังไม่มีคำทำนายให้บันทึก — ลองถามหรือใช้เครื่องมือก่อนนะ", "sys"); return; }
+      MEDIUM_JOURNAL.save(P ? P.name : "หมอดูทิพย์", lastAnswer);
+      addMsg("ระบบ: บันทึกคำทำนายลงสมุดแล้ว 📖 กลับมาติ๊กได้ว่าตรงไหม", "sys");
+    };
+    document.getElementById("btn-journal").onclick = () => {
+      MEDIUM_JOURNAL.render(journalList);
+      journalModal.hidden = false;
+    };
+    document.getElementById("journal-close").onclick = () => journalModal.hidden = true;
+    journalModal.addEventListener("click", e => { if (e.target === journalModal) journalModal.hidden = true; });
+    document.getElementById("journal-clear").onclick = () => {
+      MEDIUM_JOURNAL.clear();
+      MEDIUM_JOURNAL.render(journalList);
+    };
+    journalList.addEventListener("click", e => {
+      const item = e.target.closest(".journal-item");
+      if (!item) return;
+      const id = item.dataset.id;
+      if (e.target.dataset.acc) MEDIUM_JOURNAL.mark(id, e.target.dataset.acc === "yes");
+      else if (e.target.dataset.del) MEDIUM_JOURNAL.remove(id);
+      else return;
+      MEDIUM_JOURNAL.render(journalList);
     });
 
     // ---------- ออกจากร่าง ----------

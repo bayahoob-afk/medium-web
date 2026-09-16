@@ -481,3 +481,16 @@ button { font-family: inherit; cursor: pointer; }
   font-size: .72rem; font-weight: 600; cursor: default;
   padding: 4px; word-break: break-word;
 }
+
+/* ---------- สมุดคำทำนาย ---------- */
+.journal-item {
+  border: 1px solid var(--line, rgba(230,184,76,.25));
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin: 10px 0;
+  background: rgba(0,0,0,.2);
+}
+.journal-item p { margin: 8px 0; font-size: .9rem; white-space: pre-line; }
+.journal-head { display: flex; justify-content: space-between; gap: 10px; font-size: .85rem; flex-wrap: wrap; }
+.journal-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font-size: .8rem; }
+#journal-list { max-height: 55vh; overflow-y: auto; }
