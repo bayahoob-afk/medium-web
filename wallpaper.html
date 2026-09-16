@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>วอลเปเปอร์เสริมดวง ฟรี — สร้างจากดวงของคุณเอง | Medium</title>
+  <meta name="description" content="สร้างวอลเปเปอร์มือถือเสริมดวงฟรี เลือกด้านการเงิน ความรัก โชคลาภ การงาน พร้อมเลขนำโชคและสีมงคลจากวันเกิดของคุณ ดาวน์โหลดได้ทันที ไม่ต้องสมัครสมาชิก">
+  <link rel="canonical" href="https://bayahoob-afk.github.io/medium-web/wallpaper.html">
+  <meta property="og:title" content="วอลเปเปอร์เสริมดวง ฟรี — สร้างจากดวงของคุณเอง">
+  <meta property="og:description" content="เลือกด้านที่อยากเสริม การเงิน/ความรัก/โชคลาภ/การงาน ระบบสร้างวอลเปเปอร์พร้อมเลขนำโชคและสีมงคลเฉพาะดวงคุณ ดาวน์โหลดฟรี">
+  <meta property="og:url" content="https://bayahoob-afk.github.io/medium-web/wallpaper.html">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔮</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#12081f">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-page="wallpaper">
+  <header class="nav" id="app-nav"></header>
+
+  <section class="section container">
+    <div class="section-head">
+      <h2>วอลเปเปอร์<span class="em">เสริมดวง</span> เฉพาะดวงคุณ</h2>
+      <p>เลือกด้านที่อยากเสริม ระบบจะสร้างภาพพร้อมเลขนำโชคและสีมงคลจากวันเกิดของคุณ — ฟรี ไม่ต้องสมัคร</p>
+    </div>
+
+    <div class="wp-layout">
+      <div class="card">
+        <h3 style="margin-top:0">1) เลือกด้านที่อยากเสริม</h3>
+        <div id="goal-chips" style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="chip goal-chip active" data-goal="money">💰 การเงิน</button>
+          <button class="chip goal-chip" data-goal="love">💗 ความรัก</button>
+          <button class="chip goal-chip" data-goal="luck">🍀 โชคลาภ</button>
+          <button class="chip goal-chip" data-goal="work">💼 การงาน</button>
+        </div>
+
+        <h3>2) วันเกิด (ไม่บังคับ)</h3>
+        <p class="muted" style="font-size:.85rem;margin:0 0 8px">
+          ใช้คำนวณสีมงคลและเลขนำโชคเฉพาะคุณ — เก็บในเครื่องคุณเท่านั้น ไม่ส่งไปที่ใด</p>
+        <div class="tool-row" style="display:flex;gap:8px;flex-wrap:wrap">
+          <input type="date" id="wp-dob" style="flex:1;min-width:150px;background:rgba(0,0,0,.3);color:inherit;border:1px solid var(--line);border-radius:10px;padding:8px 12px;font:inherit">
+        </div>
+
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:18px">
+          <button class="btn btn-gold" id="wp-download">⬇️ ดาวน์โหลดฟรี</button>
+          <button class="btn btn-purple" id="wp-share">📤 แชร์ให้เพื่อน</button>
+        </div>
+        <p class="muted" style="font-size:.8rem;margin-top:12px">
+          💡 วิธีใช้: ดาวน์โหลดแล้วตั้งเป็นหน้าจอล็อก/โฮมได้เลย · ขนาด 1080×2340 พอดีจอมือถือ<br>
+          อยากรู้ความหมายเลขของคุณลึกขึ้น ถาม<a href="medium.html#numerology" class="gold">หมอดูทิพย์เลขศาสตร์</a>ต่อได้เลย</p>
+      </div>
+
+      <div class="card tc">
+        <h3 style="margin-top:0">ตัวอย่างวอลเปเปอร์ของคุณ</h3>
+        <canvas id="wp-canvas" style="width:100%;max-width:260px;border-radius:18px;border:1px solid var(--line)"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer" id="app-footer"></footer>
+
+  <script src="assets/js/app.js"></script>
+  <script src="assets/js/daily.js"></script>
+  <script src="assets/js/sharecard.js"></script>
+  <script>
+    let goal = "money";
+    const dobInput = document.getElementById("wp-dob");
+    const preview = document.getElementById("wp-canvas");
+
+    // ถ้ามีโปรไฟล์ดวงจากหน้าแรกอยู่แล้ว เติมวันเกิดให้อัตโนมัติ
+    const profile = window.MEDIUM_DAILY.getProfile();
+    if (profile && profile.dob) dobInput.value = profile.dob;
+
+    function makeCanvas() {
+      return MEDIUM_CARD.drawWallpaper({ goal, dob: dobInput.value || null });
+    }
+    function renderPreview() {
+      const src = makeCanvas();
+      preview.width = src.width; preview.height = src.height;
+      preview.getContext("2d").drawImage(src, 0, 0);
+    }
+
+    document.getElementById("goal-chips").addEventListener("click", e => {
+      const chip = e.target.closest(".goal-chip");
+      if (!chip) return;
+      goal = chip.dataset.goal;
+      document.querySelectorAll(".goal-chip").forEach(c => c.classList.toggle("active", c === chip));
+      renderPreview();
+    });
+    dobInput.addEventListener("change", () => {
+      if (dobInput.value) window.MEDIUM_DAILY.saveProfile({ ...(profile || {}), dob: dobInput.value });
+      renderPreview();
+    });
+
+    document.getElementById("wp-download").onclick = () =>
+      MEDIUM_CARD.download(makeCanvas(), "medium-wallpaper-" + goal + ".png");
+    document.getElementById("wp-share").onclick = () =>
+      MEDIUM_CARD.share(makeCanvas(), "medium-wallpaper-" + goal + ".png",
+        "🔮 วอลเปเปอร์เสริมดวงของฉันจาก Medium — สร้างของคุณเองฟรีที่ " + location.href);
+
+    renderPreview();
+  </script>
+</body>
+</html>

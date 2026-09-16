@@ -53,6 +53,7 @@
     </div>
     <div class="tc mt-3" style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
       <button class="btn btn-ghost" id="btn-share">📤 แชร์คำทำนาย</button>
+      <button class="btn btn-ghost" id="btn-card">🖼️ การ์ดคำทำนาย</button>
       <button class="btn btn-ghost" id="btn-journal-save">💾 บันทึกลงสมุด</button>
       <button class="btn btn-ghost" id="btn-journal">📖 สมุดคำทำนาย</button>
       <button class="btn btn-ghost" id="btn-leave">🙏 กราบลา / จบการสนทนา</button>
@@ -77,6 +78,7 @@
   <script src="data/personas.js"></script>
   <script src="assets/js/app.js"></script>
   <script src="assets/js/journal.js"></script>
+  <script src="assets/js/sharecard.js"></script>
   <script>
     const personas = window.MEDIUM_PERSONAS || [];
     const grid = document.getElementById("persona-grid");
@@ -540,6 +542,14 @@
         await navigator.clipboard.writeText(text);
         addMsg("ระบบ: คัดลอกคำทำนายแล้ว 📋 นำไปแชร์ต่อได้เลย", "sys");
       } catch (e) { /* ผู้ใช้กดยกเลิกแชร์ — ไม่ต้องทำอะไร */ }
+    };
+
+    // การ์ดคำทำนายเป็นรูปภาพ พร้อมแชร์ลงโซเชียลหรือดาวน์โหลดเก็บ
+    document.getElementById("btn-card").onclick = async () => {
+      if (!lastAnswer) { addMsg("ระบบ: ยังไม่มีคำทำนายให้ทำการ์ด — ลองถามหรือใช้เครื่องมือก่อนนะ", "sys"); return; }
+      const canvas = MEDIUM_CARD.drawReadingCard({ source: P ? P.name : "หมอดูทิพย์ Medium", text: lastAnswer });
+      const result = await MEDIUM_CARD.share(canvas, "medium-card.png", "🔮 คำทำนายของฉันจาก Medium");
+      if (result === "downloaded") addMsg("ระบบ: บันทึกการ์ดคำทำนายเป็นรูปให้แล้ว 🖼️ นำไปแชร์ต่อได้เลย", "sys");
     };
 
     document.getElementById("m-send").onclick = () => ask(input.value);

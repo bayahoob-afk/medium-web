@@ -9,6 +9,7 @@
         <a href="index.html" ${page === "home" ? 'class="active"' : ""}>หน้าแรก</a>
         <a href="seers.html" ${page === "seers" ? 'class="active"' : ""}>หาหมอดู</a>
         <a href="medium.html" ${page === "medium" ? 'class="active"' : ""}>หมอดูทิพย์</a>
+        <a href="wallpaper.html" ${page === "wallpaper" ? 'class="active"' : ""}>วอลเปเปอร์มงคล</a>
         <a href="session.html" ${page === "session" ? 'class="active"' : ""}>เดโมเซสชัน</a>
         <a href="dashboard.html" ${page === "dashboard" ? 'class="active"' : ""}>หลังบ้านหมอดู</a>
       </nav>
