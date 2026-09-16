@@ -17,9 +17,9 @@
   <!-- STEP 1: เลือกองค์ -->
   <section class="section container" id="step-select">
     <div class="section-head">
-      <h2>🕯️ ห้องหมอดูทิพย์ — เลือก<span class="em">องค์</span>ที่ต้องการเข้าเฝ้า</h2>
-      <p>หมอดูทิพย์แต่ละองค์ถูกสร้างจากการศึกษาศาสตร์ความเชื่อจริง
-        ทั้งตำนาน ของไหว้ คาถา และข้อห้าม — พร้อมให้คำปรึกษาตลอด 24 ชั่วโมง</p>
+      <h2>🕯️ ห้องหมอดูทิพย์ — เลือก<span class="em">องค์เทพหรือศาสตร์</span>ที่ต้องการปรึกษา</h2>
+      <p>หมอดูทิพย์ทุกตนถูกสร้างจากการศึกษาศาสตร์ความเชื่อจริง ครบทั้งสายองค์เทพและสายศาสตร์พยากรณ์
+        — พร้อมให้คำปรึกษาตลอด 24 ชั่วโมง ไม่ต้องรอคิว</p>
     </div>
     <div class="grid grid-4" id="persona-grid"></div>
     <p class="tc muted mt-3" style="font-size:.85rem">
@@ -44,7 +44,7 @@
         <div class="chat-body" id="m-chat-body"></div>
         <div class="quick-chips" id="quick-chips"></div>
         <div class="chat-input-row">
-          <input id="m-input" placeholder="พิมพ์คำถามถึงองค์ท่าน...">
+          <input id="m-input" placeholder="พิมพ์คำถามของคุณ...">
           <button class="btn btn-gold btn-sm" id="m-send">ถาม</button>
         </div>
       </div>
@@ -52,7 +52,7 @@
     </div>
     <div class="tc mt-3" style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
       <button class="btn btn-ghost" id="btn-share">📤 แชร์คำทำนาย</button>
-      <button class="btn btn-ghost" id="btn-leave">🙏 กราบลาออกจากร่าง</button>
+      <button class="btn btn-ghost" id="btn-leave">🙏 กราบลา / จบการสนทนา</button>
     </div>
   </section>
 
@@ -71,7 +71,7 @@
         <h3>${p.name}</h3>
         <div class="domain">ศาสตร์${p.domain} · ${p.deity}</div>
         <p class="tagline">${p.tagline || ""}</p>
-        <button class="btn btn-purple btn-sm">เข้าเฝ้า</button>
+        <button class="btn btn-purple btn-sm">เริ่มปรึกษา</button>
       </div>`).join("");
 
     grid.addEventListener("click", e => {
@@ -100,7 +100,7 @@
       const steps = [
         "จุดธูปเทียน... ตั้งจิตอธิษฐาน...",
         `กำลังเชื่อมต่อกับ${P.deity}...`,
-        "องค์ท่านเสด็จมาถึงแล้ว..."
+        "พร้อมให้คำปรึกษาแล้ว..."
       ];
       let i = 0;
       txt.textContent = steps[0];
@@ -159,7 +159,7 @@
         <p style="font-size:.78rem;margin-top:14px;border-top:1px dashed var(--line);padding-top:10px">
           ⚠️ เพื่อเป็นแนวทางและกำลังใจเท่านั้น</p>`;
 
-      addMsg("🕯️ เชื่อมต่อสำเร็จ องค์ท่านพร้อมรับคำถามแล้ว", "sys");
+      addMsg("🕯️ เชื่อมต่อสำเร็จ พร้อมรับคำถามแล้ว", "sys");
       history = [{ role: "assistant", content: P.greeting }]; // เริ่มบริบทใหม่ทุกครั้งที่เปิดร่าง
       setTimeout(() => addMsg(P.greeting, "them"), 700);
     }
@@ -215,7 +215,7 @@
         if (matched) {
           const tag = document.createElement("div");
           tag.className = "msg sys";
-          tag.textContent = `🔮 องค์ท่านหยั่งรู้ว่าเจ้าถามเรื่อง "${matched.label}"`;
+          tag.textContent = `🔮 หยั่งรู้แล้วว่าเจ้าถามเรื่อง "${matched.label}"`;
           chatBody.insertBefore(tag, typing);
         }
         chatBody.scrollTop = chatBody.scrollHeight;
@@ -238,7 +238,7 @@
     // ---------- แชร์คำทำนาย (viral loop) ----------
     let lastAnswer = "";
     document.getElementById("btn-share").onclick = async () => {
-      const text = `🔮 คำทำนายจาก${P ? P.name : "หมอดูทิพย์ Medium"}\n\n${lastAnswer || "ลองถามองค์ท่านดูก่อนนะ"}\n\n— ดูดวงกับหมอดูทิพย์ได้ที่ ${location.origin + location.pathname}`;
+      const text = `🔮 คำทำนายจาก${P ? P.name : "หมอดูทิพย์ Medium"}\n\n${lastAnswer || "ลองถามดูก่อนนะ"}\n\n— ดูดวงกับหมอดูทิพย์ได้ที่ ${location.origin + location.pathname}`;
       try {
         if (navigator.share) { await navigator.share({ text }); return; }
         await navigator.clipboard.writeText(text);
@@ -255,8 +255,8 @@
 
     // ---------- ออกจากร่าง ----------
     document.getElementById("btn-leave").onclick = () => {
-      addMsg(P.closing || "องค์ท่านเสด็จกลับแล้ว", "them");
-      addMsg("🕯️ องค์ท่านออกจากร่างแล้ว — กราบขอบพระคุณ", "sys");
+      addMsg(P.closing || "การสนทนาจบลงแล้ว ขอบคุณที่มาปรึกษา", "them");
+      addMsg("🕯️ จบการสนทนาแล้ว — ขอบคุณที่มาปรึกษา", "sys");
       leaveTimer = setTimeout(() => {
         document.getElementById("step-chat").hidden = true;
         document.getElementById("step-select").hidden = false;

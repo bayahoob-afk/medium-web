@@ -27,6 +27,14 @@
 
     <div class="grid grid-3" id="seer-grid"></div>
     <p class="tc muted mt-3" id="no-result" hidden>ไม่พบหมอดูที่ตรงกับการค้นหา ลองเปลี่ยนคำค้นดูนะคะ</p>
+
+    <!-- Fallback: หมอดูทิพย์ เมื่อหมอดูไม่ว่าง/อยากถามทันที -->
+    <div class="card mt-3" id="tipya-fallback" style="text-align:center">
+      <span class="icon">🕯️</span>
+      <h3 id="tipya-title">ไม่อยากรอคิว? ถามหมอดูทิพย์ได้ทันที</h3>
+      <p class="muted" id="tipya-sub">ระบบตอบอัตโนมัติที่ศึกษาศาสตร์ความเชื่อจริง เปิดตลอด 24 ชม. ฟรี — ไม่ใช่บุคคลจริง</p>
+      <a class="btn btn-purple btn-sm" id="tipya-link" href="medium.html">🕯️ เข้าห้องหมอดูทิพย์ →</a>
+    </div>
   </section>
 
   <footer class="footer" id="app-footer"></footer>
@@ -47,6 +55,13 @@
     const searchEl = document.getElementById("search");
     const noResult = document.getElementById("no-result");
     let activeCraft = "ทั้งหมด";
+
+    // ศาสตร์ → หมอดูทิพย์ประจำศาสตร์ (fallback เมื่อหมอดูไม่ว่าง)
+    const CRAFT_PERSONA = {
+      "ไพ่ยิปซี": "tarot", "โหราศาสตร์ไทย": "thai-astro", "เลข 7 ตัว 9 ฐาน": "numerology",
+      "ลายมือ": "palmistry", "ไพ่ออราเคิล": "oracle", "โหราศาสตร์ยูเรเนียน": "uranian",
+      "จิตสัมผัส": "sixth-sense", "ฮวงจุ้ย": "fengshui"
+    };
 
     // สร้างชิปฟิลเตอร์จากศาสตร์ที่มีจริงในข้อมูล
     const crafts = ["ทั้งหมด", ...new Set(window.SEERS.map(s => s.craft))];
@@ -92,6 +107,23 @@
             <button class="btn btn-gold btn-sm" onclick="openBooking('${s.id}')">จองคิว</button>
           </div>
         </div>`).join("");
+      updateTipya(list);
+    }
+
+    // ปรับการ์ดหมอดูทิพย์ตามศาสตร์ที่เลือก และเด่นขึ้นเมื่อไม่มีหมอดูออนไลน์
+    function updateTipya(list) {
+      const pid = CRAFT_PERSONA[activeCraft];
+      const link = document.getElementById("tipya-link");
+      const title = document.getElementById("tipya-title");
+      link.href = pid ? `medium.html#${pid}` : "medium.html";
+      const noneOnline = list.length === 0 || list.every(s => !s.online);
+      title.textContent = noneOnline
+        ? (activeCraft === "ทั้งหมด"
+            ? "ตอนนี้หมอดูไม่ว่าง — ถามหมอดูทิพย์ก่อนได้เลย"
+            : `หมอดู${activeCraft}ไม่ว่างตอนนี้ — ถามหมอดูทิพย์${activeCraft}ก่อนได้เลย`)
+        : (activeCraft === "ทั้งหมด"
+            ? "ไม่อยากรอคิว? ถามหมอดูทิพย์ได้ทันที"
+            : `ไม่อยากรอคิว? ถามหมอดูทิพย์${activeCraft}ได้ทันที`);
     }
     render();
 
@@ -180,6 +212,10 @@
             เงินของคุณพักไว้ในระบบอย่างปลอดภัยแล้ว
           </p>
           <a href="session.html" class="btn btn-purple mt-2">🎥 เข้าเซสชันเลย (เดโม)</a>
+          <p class="muted" style="font-size:.85rem;margin-top:14px">
+            ระหว่างรอถึงเวลานัด —
+            <a href="medium.html${CRAFT_PERSONA[currentSeer.craft] ? "#" + CRAFT_PERSONA[currentSeer.craft] : ""}" class="gold">คุยกับหมอดูทิพย์${currentSeer.craft}ก่อนได้ ฟรี →</a>
+          </p>
         </div>`;
     }
   </script>
