@@ -1,5 +1,5 @@
 /* ============================================
-   MEDIUM — แพลตฟอร์มหมอดู & ร่างทรง AI
+   MEDIUM — แพลตฟอร์มหมอดูตัวจริง & หมอดู AI
    Design System: Mystic Modern (ม่วงเข้ม-ทอง)
    ============================================ */
 
@@ -322,7 +322,7 @@ button { font-family: inherit; cursor: pointer; }
   border: 1px solid var(--line);
 }
 
-/* ---------- Medium (ร่างทรง) ---------- */
+/* ---------- Medium (หมอดู AI) ---------- */
 .persona-card {
   background: var(--bg-card); border: 1px solid var(--line);
   border-radius: 20px; padding: 28px; text-align: center;

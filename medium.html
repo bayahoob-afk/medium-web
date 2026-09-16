@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>ห้องร่างทรง AI — Medium</title>
+  <title>ห้องหมอดู AI — Medium</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔮</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -17,9 +17,9 @@
   <!-- STEP 1: เลือกองค์ -->
   <section class="section container" id="step-select">
     <div class="section-head">
-      <h2>🕯️ ห้องประทับทรง — เลือก<span class="em">องค์</span>ที่ต้องการเข้าเฝ้า</h2>
-      <p>ร่างทรง AI แต่ละองค์ถูกสร้างจากการศึกษาศาสตร์ความเชื่อจริง
-        ทั้งตำนาน ของไหว้ คาถา และข้อห้าม — พร้อมประทับทรงตลอด 24 ชั่วโมง</p>
+      <h2>🕯️ ห้องหมอดู AI — เลือก<span class="em">องค์</span>ที่ต้องการเข้าเฝ้า</h2>
+      <p>หมอดู AI แต่ละองค์ถูกสร้างจากการศึกษาศาสตร์ความเชื่อจริง
+        ทั้งตำนาน ของไหว้ คาถา และข้อห้าม — พร้อมให้คำปรึกษาตลอด 24 ชั่วโมง</p>
     </div>
     <div class="grid grid-4" id="persona-grid"></div>
     <p class="tc muted mt-3" style="font-size:.85rem">
@@ -29,18 +29,18 @@
   <!-- STEP 2: พิธีเปิดร่าง -->
   <div class="trance" id="trance" hidden>
     <div class="orb-big" id="trance-emoji">🕯️</div>
-    <p id="trance-text">กำลังอัญเชิญองค์เทพ...</p>
+    <p id="trance-text">กำลังเชื่อมต่อกับองค์เทพ...</p>
   </div>
 
   <!-- STEP 3: ห้องสนทนา -->
   <section class="section container" id="step-chat" hidden>
     <div class="section-head">
-      <h2 id="chat-title">ร่างทรง</h2>
+      <h2 id="chat-title">หมอดู AI</h2>
       <p id="chat-sub"></p>
     </div>
     <div class="medium-layout">
       <div class="chat-panel medium-chat">
-        <div class="chat-head" id="chat-head">💬 สนทนากับร่างทรง</div>
+        <div class="chat-head" id="chat-head">💬 สนทนากับหมอดู AI</div>
         <div class="chat-body" id="m-chat-body"></div>
         <div class="quick-chips" id="quick-chips"></div>
         <div class="chat-input-row">
@@ -99,7 +99,7 @@
       trance.hidden = false;
       const steps = [
         "จุดธูปเทียน... ตั้งจิตอธิษฐาน...",
-        `กำลังอัญเชิญ${P.deity}เสด็จลงประทับทรง...`,
+        `กำลังเชื่อมต่อกับ${P.deity}...`,
         "องค์ท่านเสด็จมาถึงแล้ว..."
       ];
       let i = 0;
@@ -159,7 +159,7 @@
         <p style="font-size:.78rem;margin-top:14px;border-top:1px dashed var(--line);padding-top:10px">
           ⚠️ เพื่อเป็นแนวทางและกำลังใจเท่านั้น</p>`;
 
-      addMsg("🕯️ องค์ท่านลงประทับทรงแล้ว", "sys");
+      addMsg("🕯️ เชื่อมต่อสำเร็จ องค์ท่านพร้อมรับคำถามแล้ว", "sys");
       history = [{ role: "assistant", content: P.greeting }]; // เริ่มบริบทใหม่ทุกครั้งที่เปิดร่าง
       setTimeout(() => addMsg(P.greeting, "them"), 700);
     }
@@ -238,7 +238,7 @@
     // ---------- แชร์คำทำนาย (viral loop) ----------
     let lastAnswer = "";
     document.getElementById("btn-share").onclick = async () => {
-      const text = `🔮 คำทำนายจาก${P ? P.name : "ร่างทรง Medium"}\n\n${lastAnswer || "ลองถามองค์ท่านดูก่อนนะ"}\n\n— ดูดวงกับร่างทรง AI ได้ที่ ${location.origin + location.pathname}`;
+      const text = `🔮 คำทำนายจาก${P ? P.name : "หมอดู AI Medium"}\n\n${lastAnswer || "ลองถามองค์ท่านดูก่อนนะ"}\n\n— ดูดวงกับหมอดู AI ได้ที่ ${location.origin + location.pathname}`;
       try {
         if (navigator.share) { await navigator.share({ text }); return; }
         await navigator.clipboard.writeText(text);

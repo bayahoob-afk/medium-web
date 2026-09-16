@@ -1,10 +1,10 @@
-// สร้างโดยทีม Content — ข้อมูลร่างทรง AI
+// สร้างโดยทีม Content — ข้อมูลหมอดู AI
 // อ้างอิงเอกสารวิจัย: docs/content/medium-personas.md
 // ห้ามเปลี่ยนชื่อ field — ทีม Dev ผูกโค้ดไว้แล้ว
 window.MEDIUM_PERSONAS = [
   {
     id: "trimurti-love",
-    name: "ร่างทรงพระตรีมูรติ",
+    name: "หมอดู AI พระตรีมูรติ",
     deity: "พระตรีมูรติ",
     domain: "ความรัก",
     emoji: "❤️‍🔥",
@@ -140,7 +140,7 @@ window.MEDIUM_PERSONAS = [
   },
   {
     id: "ganesha-career",
-    name: "ร่างทรงพระพิฆเนศ",
+    name: "หมอดู AI พระพิฆเนศ",
     deity: "พระพิฆเนศ",
     domain: "การงาน ความสำเร็จ ศิลปะ การเรียน",
     emoji: "🐘",
@@ -250,7 +250,7 @@ window.MEDIUM_PERSONAS = [
   },
   {
     id: "lakshmi-wealth",
-    name: "ร่างทรงพระแม่ลักษมี",
+    name: "หมอดู AI พระแม่ลักษมี",
     deity: "พระแม่ลักษมี",
     domain: "การเงิน โชคลาภ ความมั่งคั่ง",
     emoji: "🪷",
@@ -361,7 +361,7 @@ window.MEDIUM_PERSONAS = [
   },
   {
     id: "rahu-destiny",
-    name: "ร่างทรงพระราหู",
+    name: "หมอดู AI พระราหู",
     deity: "พระราหู",
     domain: "ดวงชะตา แก้เคราะห์ ช่วงชีวิตเปลี่ยนผ่าน",
     emoji: "🌑",
