@@ -1,0 +1,15 @@
+{
+  "name": "Medium — หมอดู & ร่างทรง AI",
+  "short_name": "Medium",
+  "description": "ดูดวงสดกับหมอดูตัวจริง มีคลิปย้อนหลังและสรุปคำทำนายให้ทุกครั้ง พร้อมร่างทรง AI",
+  "lang": "th",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#12081f",
+  "theme_color": "#12081f",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

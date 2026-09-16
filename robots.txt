@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://bayahoob-afk.github.io/medium-web/sitemap.xml

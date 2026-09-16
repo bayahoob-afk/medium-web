@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>เซสชันดูดวง — Medium</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔮</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#12081f">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-page="session">
+  <header class="nav" id="app-nav"></header>
+
+  <!-- STEP 1: CONSENT -->
+  <section class="section container" id="step-consent">
+    <div class="consent-card">
+      <h2>🎥 ก่อนเริ่มเซสชัน</h2>
+      <p class="muted">เซสชันนี้จะถูก<b class="gold">บันทึกวิดีโอ</b>เพื่อประโยชน์ของคุณเอง
+        โปรดอ่านและยืนยันความยินยอมตามหลัก PDPA</p>
+      <div class="consent-list">
+        <div class="consent-item"><span class="ci">🎬</span>
+          <span>วิดีโอจะถูกบันทึกตลอดเซสชัน เพื่อให้คุณ<b>ดูย้อนหลังได้ไม่จำกัด</b>ภายใน 1 ปี</span></div>
+        <div class="consent-item"><span class="ci">🤖</span>
+          <span>AI จะถอดเสียงบทสนทนาเพื่อสร้าง<b>สรุปคำทำนาย</b>ส่งให้คุณหลังจบเซสชันทันที</span></div>
+        <div class="consent-item"><span class="ci">🔒</span>
+          <span>วิดีโอเข้าถึงได้เฉพาะคุณและหมอดูคู่สนทนาเท่านั้น และคุณ<b>ขอลบได้ทุกเมื่อ</b></span></div>
+        <div class="consent-item"><span class="ci">🚫</span>
+          <span>ห้ามทำธุรกรรมนอกแพลตฟอร์ม — หากหมอดูชวนโอนเงินส่วนตัว กด "รายงาน" ได้ทันที</span></div>
+      </div>
+      <label class="check-row"><input type="checkbox" id="c1"> ฉันยินยอมให้บันทึกวิดีโอและถอดเสียงเซสชันนี้</label>
+      <label class="check-row"><input type="checkbox" id="c2"> ฉันเข้าใจว่าบริการนี้เพื่อความบันเทิงและเป็นแนวทาง ไม่ใช่คำแนะนำการแพทย์/การเงิน/กฎหมาย</label>
+      <button class="btn btn-gold mt-2" style="width:100%" id="btn-start" disabled>เริ่มเซสชัน →</button>
+      <p class="muted tc" style="font-size:.8rem;margin-top:12px">หมอดูกดยินยอมฝั่งตนแล้ว ✓ กำลังรอคุณ</p>
+    </div>
+  </section>
+
+  <!-- STEP 2: LIVE CALL -->
+  <section class="section container" id="step-call" hidden>
+    <div class="section-head">
+      <h2>กำลังดูดวงกับ <span class="em" id="call-seer-name">หมอดู</span></h2>
+      <p id="call-topic-line"></p>
+    </div>
+    <div class="grid" style="grid-template-columns: 1.6fr 1fr; gap:20px" id="call-grid">
+      <div>
+        <div class="call-stage">
+          <div class="rec-pill"><span class="rec-dot"></span> REC · กำลังบันทึก</div>
+          <div class="call-timer" id="timer">00:00</div>
+          <div class="call-avatar" id="call-avatar">🔮</div>
+          <p class="mt-2 muted" id="call-status">หมอดูกำลังเปิดไพ่ให้คุณ...</p>
+          <div class="self-cam" id="self-cam">📷 กล้องของคุณ</div>
+        </div>
+        <div class="call-controls">
+          <button class="ctrl-btn" title="ไมค์">🎙️</button>
+          <button class="ctrl-btn" title="กล้อง">📷</button>
+          <button class="ctrl-btn" title="แชร์หน้าจอ">🖥️</button>
+          <button class="ctrl-btn end" id="btn-end">📞 จบเซสชัน</button>
+        </div>
+      </div>
+      <div class="chat-panel">
+        <div class="chat-head">💬 แชทระหว่างเซสชัน</div>
+        <div class="chat-body" id="chat-body"></div>
+        <div class="chat-input-row">
+          <input id="chat-input" placeholder="พิมพ์ถามหมอดู...">
+          <button class="btn btn-purple btn-sm" id="chat-send">ส่ง</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STEP 3: SUMMARY -->
+  <section class="section container" id="step-summary" hidden>
+    <div class="section-head">
+      <h2>✨ จบเซสชันแล้ว — นี่คือ<span class="em">สรุปคำทำนาย</span>ของคุณ</h2>
+      <p>ระบบถอดเสียงและสรุปให้อัตโนมัติ ส่งเข้าอีเมล/แอปของคุณแล้วด้วย</p>
+    </div>
+    <div style="max-width:680px;margin:0 auto">
+      <div class="report" id="report"></div>
+      <div class="video-card">
+        <div class="video-thumb">▶️</div>
+        <div style="flex:1">
+          <b>วิดีโอเซสชันเต็ม</b>
+          <div class="muted" style="font-size:.85rem" id="video-meta">ความยาว — · พร้อมดูย้อนหลังแล้ว · เก็บให้ 1 ปี</div>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="alert('ในระบบจริง: เปิดวิดีโอย้อนหลังจากคลาวด์ที่เข้ารหัสไว้')">ดูคลิป</button>
+      </div>
+      <div class="tc mt-3" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+        <button class="btn btn-gold" id="btn-download">⬇️ ดาวน์โหลดสรุป (.txt)</button>
+        <a class="btn btn-ghost" href="seers.html">ให้คะแนนหมอดู & จองครั้งหน้า</a>
+      </div>
+      <!-- ขอรีวิว ณ จุดพอใจสูงสุด (หลังได้รับสรุป) — กลยุทธ์ review velocity -->
+      <div class="card tc mt-3" id="rate-card">
+        <h3>ประทับใจเซสชันนี้ไหม? ⭐</h3>
+        <p class="muted" style="font-size:.9rem">คะแนนของคุณช่วยให้คนอื่นเจอหมอดูดี ๆ ง่ายขึ้น</p>
+        <div id="rate-stars" style="font-size:2rem;cursor:pointer;letter-spacing:6px;margin:10px 0">☆☆☆☆☆</div>
+        <p class="muted" id="rate-thanks" style="font-size:.9rem" hidden></p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer" id="app-footer"></footer>
+
+  <script src="data/seers.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script>
+    // โหลดข้อมูลการจอง (ถ้าไม่มี ใช้เดโม)
+    let booking = { seerName: "อ.ไนน์ พยากรณ์", seerEmoji: "🃏", craft: "ไพ่ยิปซี", minutes: 30, topic: "ความรัก", date: "-", time: "-" };
+    try {
+      const saved = sessionStorage.getItem("mediumBooking");
+      if (saved) booking = { ...booking, ...JSON.parse(saved) };
+    } catch (e) {}
+
+    // ---------- Step 1: consent ----------
+    const c1 = document.getElementById("c1"), c2 = document.getElementById("c2");
+    const btnStart = document.getElementById("btn-start");
+    [c1, c2].forEach(c => c.addEventListener("change", () => btnStart.disabled = !(c1.checked && c2.checked)));
+    btnStart.onclick = startCall;
+
+    // ---------- ตรวจ backend AI (สำหรับสรุปคำทำนายด้วย Claude API) ----------
+    let aiEnabled = false;
+    fetch("/api/health").then(r => r.json()).then(h => { aiEnabled = !!h.aiEnabled; }).catch(() => {});
+
+    // ---------- การอัดคลิปจริง (Phase 2: MediaRecorder) ----------
+    let mediaStream = null, recorder = null, recordedChunks = [], recordedBlob = null;
+
+    async function startRecording() {
+      // ขอกล้อง+ไมค์หลังผู้ใช้กด consent แล้วเท่านั้น — ถ้าไม่ให้สิทธิ์/ไม่มีกล้อง ใช้โหมดจำลองต่อได้
+      try {
+        mediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        const cam = document.getElementById("self-cam");
+        cam.innerHTML = "";
+        const v = document.createElement("video");
+        v.muted = true; v.autoplay = true; v.playsInline = true;
+        v.style.cssText = "width:100%;height:100%;object-fit:cover;border-radius:12px";
+        v.srcObject = mediaStream;
+        cam.appendChild(v);
+        recorder = new MediaRecorder(mediaStream);
+        recordedChunks = [];
+        recorder.ondataavailable = e => { if (e.data.size) recordedChunks.push(e.data); };
+        recorder.start(1000);
+        addMsg("ระบบ: 🎥 กล้องของคุณเชื่อมต่อแล้ว — กำลังบันทึกวิดีโอจริง", "sys");
+      } catch (e) {
+        addMsg("ระบบ: ไม่พบกล้อง/ไม่ได้รับสิทธิ์ — ใช้โหมดเดโมจำลองการบันทึกแทน", "sys");
+      }
+    }
+
+    function stopRecording() {
+      return new Promise(resolve => {
+        if (!recorder || recorder.state === "inactive") return resolve();
+        recorder.onstop = () => {
+          recordedBlob = new Blob(recordedChunks, { type: recorder.mimeType || "video/webm" });
+          resolve();
+        };
+        recorder.stop();
+      }).then(() => {
+        if (mediaStream) mediaStream.getTracks().forEach(t => t.stop());
+      });
+    }
+
+    // ---------- Step 2: live call ----------
+    let seconds = 0, timerInt = null;
+    const transcript = []; // เก็บบทสนทนาไว้ส่งให้ AI สรุป
+    const chatBody = document.getElementById("chat-body");
+    const seerLines = [
+      "สวัสดีค่ะ วันนี้อยากให้เปิดเรื่อง" + booking.topic + "ก่อนเลยไหมคะ",
+      "ไพ่ที่เปิดได้ใบแรกคือ The Star — ช่วงนี้ดวงคุณกำลังฟื้นตัว มีความหวังใหม่เข้ามาชัดเจนค่ะ",
+      "แต่ไพ่กลางออก Two of Swords แปลว่าคุณกำลังลังเลกับการตัดสินใจบางอย่าง อย่าฝืนตัดสินใจตอนใจไม่นิ่งนะคะ",
+      "ช่วงปลายเดือนนี้จะมีคนเก่า ๆ ติดต่อกลับมา ให้ตั้งสติก่อนตอบค่ะ",
+      "ไพ่สุดท้าย Ten of Cups — ปลายปีภาพรวมสวยมากค่ะ ครอบครัวและความสัมพันธ์อบอุ่นขึ้นแน่นอน"
+    ];
+    let lineIdx = 0;
+
+    function addMsg(text, cls) {
+      const el = document.createElement("div");
+      el.className = "msg " + cls;
+      el.textContent = text;
+      chatBody.appendChild(el);
+      chatBody.scrollTop = chatBody.scrollHeight;
+      if (cls === "me") transcript.push({ from: "user", text });
+      if (cls === "them") transcript.push({ from: "seer", text });
+    }
+
+    function startCall() {
+      document.getElementById("step-consent").hidden = true;
+      document.getElementById("step-call").hidden = false;
+      document.getElementById("call-seer-name").textContent = booking.seerName;
+      document.getElementById("call-avatar").textContent = booking.seerEmoji;
+      document.getElementById("call-topic-line").textContent =
+        `ศาสตร์${booking.craft} · แพ็กเกจ ${booking.minutes} นาที · เรื่อง: ${booking.topic}`;
+      addMsg("ระบบ: เริ่มบันทึกวิดีโอแล้ว (ยินยอมทั้งสองฝ่าย ✓)", "sys");
+      startRecording();
+      timerInt = setInterval(() => {
+        seconds++;
+        const m = String(Math.floor(seconds / 60)).padStart(2, "0");
+        const s = String(seconds % 60).padStart(2, "0");
+        document.getElementById("timer").textContent = m + ":" + s;
+      }, 1000);
+      // หมอดูทยอยพูด
+      pushSeerLine();
+    }
+
+    function pushSeerLine() {
+      if (lineIdx >= seerLines.length) return;
+      setTimeout(() => {
+        addMsg(booking.seerName + ": " + seerLines[lineIdx], "them");
+        document.getElementById("call-status").textContent =
+          ["หมอดูกำลังเปิดไพ่ให้คุณ...", "หมอดูกำลังอ่านไพ่...", "หมอดูกำลังดูภาพรวมดวง...", "หมอดูกำลังสรุปคำแนะนำ..."][Math.min(lineIdx, 3)];
+        lineIdx++;
+        pushSeerLine();
+      }, lineIdx === 0 ? 1200 : 5000);
+    }
+
+    const chatInput = document.getElementById("chat-input");
+    document.getElementById("chat-send").onclick = sendChat;
+    chatInput.addEventListener("keydown", e => { if (e.key === "Enter") sendChat(); });
+    function sendChat() {
+      const t = chatInput.value.trim();
+      if (!t) return;
+      addMsg("คุณ: " + t, "me");
+      chatInput.value = "";
+      setTimeout(() => addMsg(booking.seerName + ": รับทราบค่ะ เดี๋ยวเปิดไพ่เรื่องนี้เพิ่มให้เลยนะคะ ✨", "them"), 1400);
+    }
+
+    // ---------- Step 3: summary ----------
+    document.getElementById("btn-end").onclick = endCall;
+    let summaryText = "";
+
+    async function endCall() {
+      clearInterval(timerInt);
+      await stopRecording();
+      document.getElementById("step-call").hidden = true;
+      document.getElementById("step-summary").hidden = false;
+      window.scrollTo({ top: 0 });
+
+      // แสดงคลิปที่อัดได้จริง (ถ้ามีกล้อง) — เล่นซ้ำ + ดาวน์โหลดได้
+      if (recordedBlob && recordedBlob.size > 0) {
+        const url = URL.createObjectURL(recordedBlob);
+        const thumb = document.querySelector(".video-thumb");
+        thumb.innerHTML = "";
+        const v = document.createElement("video");
+        v.src = url; v.controls = true; v.playsInline = true;
+        v.style.cssText = "width:100%;height:100%;object-fit:cover;border-radius:10px";
+        thumb.appendChild(v);
+        const btn = document.querySelector(".video-card .btn");
+        btn.textContent = "⬇️ ดาวน์โหลดคลิป";
+        btn.onclick = () => {
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = "เซสชันดูดวง-medium.webm";
+          a.click();
+        };
+      }
+      const dur = Math.max(seconds, 1);
+      const m = Math.floor(dur / 60), s = dur % 60;
+      const durText = (m > 0 ? m + " นาที " : "") + s + " วินาที";
+      document.getElementById("video-meta").textContent = `ความยาว ${durText} · พร้อมดูย้อนหลังแล้ว · เก็บให้ 1 ปี`;
+      const now = new Date();
+      const dateText = now.toLocaleDateString("th-TH", { year: "numeric", month: "long", day: "numeric" });
+
+      const highlights = [
+        "ดวงช่วงนี้อยู่ในจังหวะฟื้นตัว มีความหวังและโอกาสใหม่เข้ามา (ไพ่ The Star)",
+        "มีความลังเลในการตัดสินใจเรื่องสำคัญ — อย่าเพิ่งตัดสินใจตอนใจไม่นิ่ง (ไพ่ Two of Swords)",
+        "ปลายเดือนนี้มีเกณฑ์คนเก่าติดต่อกลับมา ควรตั้งสติก่อนตอบ",
+        "ภาพรวมปลายปีดีมาก ความสัมพันธ์และครอบครัวอบอุ่นขึ้น (ไพ่ Ten of Cups)"
+      ];
+      const advice = [
+        "ช่วง 2 สัปดาห์นี้ให้ชะลอการตัดสินใจใหญ่ ๆ โดยเฉพาะเรื่อง" + booking.topic,
+        "หมั่นทำบุญ/ทำสมาธิสั้น ๆ ก่อนนอน ช่วยให้ใจนิ่งขึ้นในจังหวะที่ต้องเลือก",
+        "ถ้าคนเก่าติดต่อมา ให้เวลาตัวเอง 3 วันก่อนตอบอะไรจริงจัง"
+      ];
+      const watch = ["ระวังการใช้อารมณ์ตัดสินใจช่วงสัปดาห์ที่ 3 ของเดือน", "เอกสาร/สัญญา อ่านซ้ำสองรอบก่อนเซ็น"];
+
+      const metaLine = `${booking.seerName} (${booking.craft}) · ${dateText} · ความยาวเซสชัน ${durText} · เรื่องที่ดู: ${escapeHtml(booking.topic)}`;
+      const mockReport = `
+        <h3>📋 สรุปคำทำนาย</h3>
+        <div class="meta">${metaLine}</div>
+        <div class="report-sec"><h4>🔑 ประเด็นสำคัญจากคำทำนาย</h4><ul>${highlights.map(h => `<li>${h}</li>`).join("")}</ul></div>
+        <div class="report-sec"><h4>💡 คำแนะนำจากหมอดู</h4><ul>${advice.map(a => `<li>${a}</li>`).join("")}</ul></div>
+        <div class="report-sec"><h4>⚠️ สิ่งที่ควรระวัง</h4><ul>${watch.map(w => `<li>${w}</li>`).join("")}</ul></div>
+        <div class="report-sec"><h4>🗓️ นัดหมายแนะนำ</h4>
+          <p class="muted" style="font-size:.9rem">หมอดูแนะนำให้กลับมาอัปเดตดวงอีกครั้งใน 3 เดือน — กดจองล่วงหน้ารับส่วนลด 10%</p></div>
+        <p class="muted" style="font-size:.78rem;border-top:1px dashed var(--line);padding-top:12px;margin-top:14px">
+          สรุปนี้สร้างโดย AI จากการถอดเสียงเซสชันจริง เพื่อความบันเทิงและเป็นแนวทางเท่านั้น</p>`;
+      document.getElementById("report").innerHTML = mockReport;
+
+      // ถ้ามี backend AI: ให้ Claude API สรุปจากบทสนทนาจริงของเซสชันนี้แทน
+      if (aiEnabled && transcript.length) {
+        fetch("/api/summary", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            seerName: booking.seerName, craft: booking.craft,
+            topic: booking.topic, minutes: booking.minutes, transcript
+          })
+        }).then(r => r.json()).then(data => {
+          if (!data.summary) return;
+          document.getElementById("report").innerHTML = `
+            <h3>📋 สรุปคำทำนาย <span class="badge badge-gold">สรุปโดย AI จากบทสนทนาจริง</span></h3>
+            <div class="meta">${metaLine}</div>
+            <div class="report-sec" style="white-space:pre-line;color:var(--text-dim);font-size:.95rem">${escapeHtml(data.summary)}</div>`;
+          summaryText = [
+            "===== สรุปคำทำนาย — Medium =====",
+            `หมอดู: ${booking.seerName} (${booking.craft})`,
+            `วันที่: ${dateText} | ความยาว: ${durText} | เรื่องที่ดู: ${booking.topic}`,
+            "", data.summary
+          ].join("\n");
+        }).catch(() => {});
+      }
+
+      summaryText = [
+        "===== สรุปคำทำนาย — Medium =====",
+        `หมอดู: ${booking.seerName} (${booking.craft})`,
+        `วันที่: ${dateText} | ความยาว: ${durText} | เรื่องที่ดู: ${booking.topic}`,
+        "",
+        "ประเด็นสำคัญ:", ...highlights.map(h => "  • " + h),
+        "",
+        "คำแนะนำ:", ...advice.map(a => "  • " + a),
+        "",
+        "สิ่งที่ควรระวัง:", ...watch.map(w => "  • " + w),
+        "",
+        "หมายเหตุ: สรุปนี้สร้างโดย AI เพื่อความบันเทิงและเป็นแนวทางเท่านั้น",
+        "ดูวิดีโอย้อนหลังได้ในแอป Medium ภายใน 1 ปี"
+      ].join("\n");
+    }
+
+    // ---------- ขอรีวิวหลังรับสรุป (จุดพอใจสูงสุด) ----------
+    const starsEl = document.getElementById("rate-stars");
+    starsEl.addEventListener("click", e => {
+      const rect = starsEl.getBoundingClientRect();
+      const n = Math.min(5, Math.max(1, Math.ceil((e.clientX - rect.left) / (rect.width / 5))));
+      starsEl.textContent = "★".repeat(n) + "☆".repeat(5 - n);
+      starsEl.style.color = "var(--gold)";
+      const thanks = document.getElementById("rate-thanks");
+      thanks.hidden = false;
+      thanks.textContent = n >= 4
+        ? "ขอบคุณค่ะ 🙏 ถ้าสะดวก ฝากรีวิวบนสโตร์ให้ด้วยนะคะ — ช่วยแพลตฟอร์มได้มากเลย"
+        : "ขอบคุณสำหรับความเห็นค่ะ ทีมงานจะติดต่อกลับเพื่อดูแลให้ดีขึ้น 🙏";
+      // ในระบบจริง: n >= 4 → เรียก in-app review API ของสโตร์, n < 4 → ส่งฟอร์ม feedback ภายใน
+      try { sessionStorage.setItem("mediumRating", String(n)); } catch (err) {}
+    });
+
+    document.getElementById("btn-download").onclick = () => {
+      const blob = new Blob(["﻿" + summaryText], { type: "text/plain;charset=utf-8" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "สรุปคำทำนาย-medium.txt";
+      a.click();
+      URL.revokeObjectURL(a.href);
+    };
+  </script>
+  <style>
+    @media (max-width: 900px) { #call-grid { grid-template-columns: 1fr !important; } }
+  </style>
+</body>
+</html>

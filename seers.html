@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>หาหมอดู — Medium</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔮</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#12081f">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-page="seers">
+  <header class="nav" id="app-nav"></header>
+
+  <section class="section container">
+    <div class="section-head">
+      <h2>ค้นหา<span class="em">หมอดู</span>ที่ใช่สำหรับคุณ</h2>
+      <p>ทุกคนผ่านการยืนยันตัวตน ทุกเซสชันมีคลิปย้อนหลังและสรุปคำทำนายให้เสมอ</p>
+    </div>
+
+    <div class="filter-bar">
+      <input type="text" id="search" class="search-input" placeholder="🔍 ค้นหาชื่อหมอดู ศาสตร์ หรือความเชี่ยวชาญ...">
+      <div id="craft-chips" style="display:flex;gap:8px;flex-wrap:wrap"></div>
+    </div>
+
+    <div class="grid grid-3" id="seer-grid"></div>
+    <p class="tc muted mt-3" id="no-result" hidden>ไม่พบหมอดูที่ตรงกับการค้นหา ลองเปลี่ยนคำค้นดูนะคะ</p>
+  </section>
+
+  <footer class="footer" id="app-footer"></footer>
+
+  <!-- Booking Modal -->
+  <div class="modal-backdrop" id="booking-modal" hidden>
+    <div class="modal">
+      <button class="close-x" id="modal-close">✕</button>
+      <div id="booking-body"></div>
+    </div>
+  </div>
+
+  <script src="data/seers.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script>
+    const grid = document.getElementById("seer-grid");
+    const chipsWrap = document.getElementById("craft-chips");
+    const searchEl = document.getElementById("search");
+    const noResult = document.getElementById("no-result");
+    let activeCraft = "ทั้งหมด";
+
+    // สร้างชิปฟิลเตอร์จากศาสตร์ที่มีจริงในข้อมูล
+    const crafts = ["ทั้งหมด", ...new Set(window.SEERS.map(s => s.craft))];
+    chipsWrap.innerHTML = crafts.map(c =>
+      `<button class="chip ${c === "ทั้งหมด" ? "active" : ""}" data-craft="${c}">${c}</button>`).join("");
+    chipsWrap.addEventListener("click", e => {
+      const btn = e.target.closest(".chip");
+      if (!btn) return;
+      activeCraft = btn.dataset.craft;
+      chipsWrap.querySelectorAll(".chip").forEach(x => x.classList.toggle("active", x === btn));
+      render();
+    });
+    searchEl.addEventListener("input", render);
+
+    function render() {
+      const q = searchEl.value.trim().toLowerCase();
+      const list = window.SEERS.filter(s => {
+        const matchCraft = activeCraft === "ทั้งหมด" || s.craft === activeCraft;
+        const hay = (s.name + s.craft + s.crafts.join(" ") + s.specialty + s.bio).toLowerCase();
+        return matchCraft && (!q || hay.includes(q));
+      });
+      noResult.hidden = list.length > 0;
+      grid.innerHTML = list.map(s => `
+        <div class="seer-card" id="${s.id}">
+          <div class="seer-top">
+            <div class="avatar">${s.emoji}</div>
+            <div>
+              <div class="seer-name">${s.name}</div>
+              <div class="seer-title">
+                ${s.online ? '<span class="online-dot"></span>ออนไลน์' : '<span class="offline-dot"></span>ออฟไลน์'}
+                · ${s.exp} ปี
+              </div>
+            </div>
+          </div>
+          <div class="seer-tags">
+            ${s.crafts.map(c => `<span class="badge">${c}</span>`).join("")}
+            <span class="badge badge-gold">${s.specialty}</span>
+          </div>
+          <div class="rating">${starText(s.rating)} ${s.rating} <span class="cnt">(${s.reviews.toLocaleString()} รีวิว)</span></div>
+          <p class="muted" style="font-size:.88rem">${s.bio}</p>
+          <div class="seer-foot">
+            <div class="price"><b>฿${s.pricePerMin}</b> <span>/นาที</span></div>
+            <button class="btn btn-gold btn-sm" onclick="openBooking('${s.id}')">จองคิว</button>
+          </div>
+        </div>`).join("");
+    }
+    render();
+
+    // ---------- Booking ----------
+    const modal = document.getElementById("booking-modal");
+    const body = document.getElementById("booking-body");
+    document.getElementById("modal-close").onclick = () => modal.hidden = true;
+    modal.addEventListener("click", e => { if (e.target === modal) modal.hidden = true; });
+
+    let currentSeer = null, currentPkg = 30;
+
+    function openBooking(id) {
+      currentSeer = window.SEERS.find(s => s.id === id);
+      currentPkg = 30;
+      const today = new Date().toISOString().split("T")[0];
+      body.innerHTML = `
+        <h3>จองคิว — ${currentSeer.name}</h3>
+        <p class="muted" style="font-size:.9rem">${currentSeer.craft} · ฿${currentSeer.pricePerMin}/นาที</p>
+        <div class="form-group">
+          <label>เลือกแพ็กเกจเวลา</label>
+          <div class="pkg-row">
+            ${window.SESSION_PACKAGES.map(m => `
+              <button class="pkg ${m === 30 ? "active" : ""}" data-min="${m}">
+                <b>${m} นาที</b><small>฿${(m * currentSeer.pricePerMin).toLocaleString()}</small>
+              </button>`).join("")}
+          </div>
+        </div>
+        <div class="form-group">
+          <label>วันที่</label>
+          <input type="date" id="bk-date" min="${today}" value="${today}">
+        </div>
+        <div class="form-group">
+          <label>เวลา</label>
+          <select id="bk-time">
+            ${["10:00", "11:00", "13:00", "14:30", "16:00", "18:00", "19:30", "21:00"].map(t => `<option>${t}</option>`).join("")}
+          </select>
+        </div>
+        <div class="form-group">
+          <label>เรื่องที่อยากถาม (ช่วยให้หมอดูเตรียมตัว)</label>
+          <textarea id="bk-topic" rows="2" placeholder="เช่น ความรัก การงาน ดวงปีนี้..."></textarea>
+        </div>
+        <div class="summary-box" id="bk-summary"></div>
+        <button class="btn btn-gold" style="width:100%" id="bk-confirm">💳 ชำระเงินและยืนยันการจอง</button>
+        <p class="muted tc" style="font-size:.78rem;margin-top:10px">
+          เงินจะพักไว้ในระบบ (escrow) และโอนให้หมอดูหลังจบเซสชันเท่านั้น · ยกเลิกก่อน 24 ชม. คืนเงินเต็มจำนวน
+        </p>`;
+      body.querySelectorAll(".pkg").forEach(p => p.onclick = () => {
+        currentPkg = +p.dataset.min;
+        body.querySelectorAll(".pkg").forEach(x => x.classList.toggle("active", x === p));
+        renderSummary();
+      });
+      renderSummary();
+      body.querySelector("#bk-confirm").onclick = confirmBooking;
+      modal.hidden = false;
+    }
+
+    function renderSummary() {
+      const price = currentPkg * currentSeer.pricePerMin;
+      const fee = Math.round(price * 0.2);
+      document.getElementById("bk-summary").innerHTML = `
+        <div class="row"><span>แพ็กเกจ ${currentPkg} นาที</span><span>฿${price.toLocaleString()}</span></div>
+        <div class="row"><span>รวมค่าบริการแพลตฟอร์มแล้ว (20% หักจากหมอดู)</span><span>—</span></div>
+        <div class="row"><span>🎥 อัดคลิป + 📋 สรุปคำทำนาย</span><span class="gold">ฟรี</span></div>
+        <div class="row total"><span>ยอดชำระ</span><b>฿${price.toLocaleString()}</b></div>`;
+    }
+
+    function confirmBooking() {
+      const date = body.querySelector("#bk-date").value;
+      const time = body.querySelector("#bk-time").value;
+      const topic = body.querySelector("#bk-topic").value.trim() || "ดวงโดยรวม";
+      // เก็บข้อมูลการจองไว้ให้หน้าเซสชันใช้ (จำลอง backend)
+      try {
+        sessionStorage.setItem("mediumBooking", JSON.stringify({
+          seerId: currentSeer.id, seerName: currentSeer.name, seerEmoji: currentSeer.emoji,
+          craft: currentSeer.craft, minutes: currentPkg,
+          price: currentPkg * currentSeer.pricePerMin, date, time, topic
+        }));
+      } catch (e) { /* private mode: ไปต่อได้ หน้าเซสชันมีค่า default */ }
+      body.innerHTML = `
+        <div class="tc" style="padding:20px 0">
+          <div style="font-size:3.4rem">✅</div>
+          <h3 class="mt-1">จองคิวสำเร็จ!</h3>
+          <p class="muted" style="margin:10px 0">
+            ${currentSeer.name} · ${date} เวลา ${time} น. (${currentPkg} นาที)<br>
+            เรื่องที่ถาม: ${escapeHtml(topic)}<br>
+            เงินของคุณพักไว้ในระบบอย่างปลอดภัยแล้ว
+          </p>
+          <a href="session.html" class="btn btn-purple mt-2">🎥 เข้าเซสชันเลย (เดโม)</a>
+        </div>`;
+    }
+  </script>
+</body>
+</html>

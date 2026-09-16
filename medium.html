@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>ห้องร่างทรง AI — Medium</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔮</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#12081f">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-page="medium">
+  <header class="nav" id="app-nav"></header>
+
+  <!-- STEP 1: เลือกองค์ -->
+  <section class="section container" id="step-select">
+    <div class="section-head">
+      <h2>🕯️ ห้องประทับทรง — เลือก<span class="em">องค์</span>ที่ต้องการเข้าเฝ้า</h2>
+      <p>ร่างทรง AI แต่ละองค์ถูกสร้างจากการศึกษาศาสตร์ความเชื่อจริง
+        ทั้งตำนาน ของไหว้ คาถา และข้อห้าม — พร้อมประทับทรงตลอด 24 ชั่วโมง</p>
+    </div>
+    <div class="grid grid-4" id="persona-grid"></div>
+    <p class="tc muted mt-3" style="font-size:.85rem">
+      💡 อยากดูดวงกับคนจริง? <a href="seers.html" class="gold">หาหมอดูตัวจริงได้ที่นี่</a></p>
+  </section>
+
+  <!-- STEP 2: พิธีเปิดร่าง -->
+  <div class="trance" id="trance" hidden>
+    <div class="orb-big" id="trance-emoji">🕯️</div>
+    <p id="trance-text">กำลังอัญเชิญองค์เทพ...</p>
+  </div>
+
+  <!-- STEP 3: ห้องสนทนา -->
+  <section class="section container" id="step-chat" hidden>
+    <div class="section-head">
+      <h2 id="chat-title">ร่างทรง</h2>
+      <p id="chat-sub"></p>
+    </div>
+    <div class="medium-layout">
+      <div class="chat-panel medium-chat">
+        <div class="chat-head" id="chat-head">💬 สนทนากับร่างทรง</div>
+        <div class="chat-body" id="m-chat-body"></div>
+        <div class="quick-chips" id="quick-chips"></div>
+        <div class="chat-input-row">
+          <input id="m-input" placeholder="พิมพ์คำถามถึงองค์ท่าน...">
+          <button class="btn btn-gold btn-sm" id="m-send">ถาม</button>
+        </div>
+      </div>
+      <div class="knowledge-panel" id="knowledge"></div>
+    </div>
+    <div class="tc mt-3" style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+      <button class="btn btn-ghost" id="btn-share">📤 แชร์คำทำนาย</button>
+      <button class="btn btn-ghost" id="btn-leave">🙏 กราบลาออกจากร่าง</button>
+    </div>
+  </section>
+
+  <footer class="footer" id="app-footer"></footer>
+
+  <script src="data/personas.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script>
+    const personas = window.MEDIUM_PERSONAS || [];
+    const grid = document.getElementById("persona-grid");
+    let P = null; // persona ปัจจุบัน
+
+    grid.innerHTML = personas.map(p => `
+      <div class="persona-card" style="cursor:pointer" data-id="${p.id}">
+        <div class="persona-emoji">${p.emoji}</div>
+        <h3>${p.name}</h3>
+        <div class="domain">ศาสตร์${p.domain} · ${p.deity}</div>
+        <p class="tagline">${p.tagline || ""}</p>
+        <button class="btn btn-purple btn-sm">เข้าเฝ้า</button>
+      </div>`).join("");
+
+    grid.addEventListener("click", e => {
+      const card = e.target.closest(".persona-card");
+      if (card) enterTrance(card.dataset.id);
+    });
+
+    // เปิดผ่านลิงก์ #id ได้ (เช่น จากหน้าแรก) และรองรับการเปลี่ยน hash โดยไม่ reload หน้า
+    function handleHash() {
+      const hash = location.hash.replace("#", "");
+      if (hash && hash !== (P && P.id) && personas.some(p => p.id === hash)) enterTrance(hash);
+    }
+    window.addEventListener("load", handleHash);
+    window.addEventListener("hashchange", handleHash);
+
+    // ---------- พิธีเปิดร่าง ----------
+    let leaveTimer = null;
+    function enterTrance(id) {
+      P = personas.find(p => p.id === id);
+      if (!P) return;
+      clearTimeout(leaveTimer); // ยกเลิกการปิดห้องค้างจากการลาองค์ก่อนหน้า
+      const trance = document.getElementById("trance");
+      const txt = document.getElementById("trance-text");
+      document.getElementById("trance-emoji").textContent = P.emoji;
+      trance.hidden = false;
+      const steps = [
+        "จุดธูปเทียน... ตั้งจิตอธิษฐาน...",
+        `กำลังอัญเชิญ${P.deity}เสด็จลงประทับทรง...`,
+        "องค์ท่านเสด็จมาถึงแล้ว..."
+      ];
+      let i = 0;
+      txt.textContent = steps[0];
+      const int = setInterval(() => {
+        i++;
+        if (i < steps.length) { txt.textContent = steps[i]; return; }
+        clearInterval(int);
+        trance.hidden = true;
+        openChat();
+      }, 1300);
+    }
+
+    // ---------- ห้องสนทนา ----------
+    const chatBody = document.getElementById("m-chat-body");
+    const input = document.getElementById("m-input");
+
+    function addMsg(text, cls) {
+      const el = document.createElement("div");
+      el.className = "msg " + cls;
+      el.textContent = text;
+      chatBody.appendChild(el);
+      chatBody.scrollTop = chatBody.scrollHeight;
+      return el;
+    }
+
+    function openChat() {
+      document.getElementById("step-select").hidden = true;
+      document.getElementById("step-chat").hidden = false;
+      window.scrollTo({ top: 0 });
+      chatBody.innerHTML = "";
+      document.getElementById("chat-title").innerHTML =
+        `${P.emoji} <span class="em">${P.name}</span>`;
+      document.getElementById("chat-sub").textContent = `${P.intro || ""}`;
+      document.getElementById("chat-head").textContent = `💬 ${P.name} — ศาสตร์${P.domain}`;
+
+      // ปุ่มคำถามด่วนจาก topics
+      document.getElementById("quick-chips").innerHTML =
+        (P.topics || []).slice(0, 5).map(t =>
+          `<button class="chip" data-q="${t.label}">${t.label}</button>`).join("");
+
+      // แผงความรู้ (วิธีบูชา)
+      const k = P.knowledge || {};
+      document.getElementById("knowledge").innerHTML = `
+        <h4>📿 ความเชื่อเกี่ยวกับ${P.deity}</h4>
+        <ul>${(k.beliefs || []).map(b => `<li>${b}</li>`).join("")}</ul>
+        <h4>🌺 ของไหว้</h4>
+        <ul>${(k.offerings || []).map(o => `<li>${o}</li>`).join("")}</ul>
+        <h4>🗓️ วัน-เวลาบูชา</h4>
+        <p>${k.bestTime || "-"}</p>
+        <h4>🙏 คาถาบูชา</h4>
+        <div class="mantra-box">${k.mantra || "-"}</div>
+        <h4>🚫 ข้อห้าม</h4>
+        <ul>${(k.taboos || []).map(t => `<li>${t}</li>`).join("")}</ul>
+        <h4>🎗️ วิธีแก้บน</h4>
+        <p>${k.vowRepay || "-"}</p>
+        <p style="font-size:.78rem;margin-top:14px;border-top:1px dashed var(--line);padding-top:10px">
+          ⚠️ เพื่อเป็นแนวทางและกำลังใจเท่านั้น</p>`;
+
+      addMsg("🕯️ องค์ท่านลงประทับทรงแล้ว", "sys");
+      history = [{ role: "assistant", content: P.greeting }]; // เริ่มบริบทใหม่ทุกครั้งที่เปิดร่าง
+      setTimeout(() => addMsg(P.greeting, "them"), 700);
+    }
+
+    // ---------- ตรวจว่ามี backend AI (Claude API) ให้ใช้ไหม ----------
+    let aiEnabled = false;
+    let history = []; // เก็บบทสนทนาสำหรับส่งให้ API
+    fetch("/api/health").then(r => r.json()).then(h => { aiEnabled = !!h.aiEnabled; }).catch(() => {});
+
+    async function replyViaApi(userText) {
+      history.push({ role: "user", content: userText });
+      const r = await fetch("/api/medium-chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ personaId: P.id, messages: history })
+      });
+      if (!r.ok) throw new Error("api error");
+      const data = await r.json();
+      if (!data.reply) throw new Error("empty reply");
+      history.push({ role: "assistant", content: data.reply });
+      return data.reply;
+    }
+
+    // ---------- Engine ตอบคำถามในเครื่อง (fallback เมื่อไม่มี backend) ----------
+    function reply(userText) {
+      const q = userText.toLowerCase();
+      let pool = null, matched = null;
+      for (const t of (P.topics || [])) {
+        if ((t.keywords || []).some(kw => q.includes(kw.toLowerCase()))) {
+          matched = t; pool = t.responses; break;
+        }
+      }
+      if (!pool || !pool.length) pool = P.fortunes || ["ขอให้เจ้าตั้งจิตให้นิ่ง แล้วถามมาอีกครั้งเถิด"];
+      let answer = pickRandom(pool);
+      // ผูกคำอวยพรท้ายคำตอบเป็นบางครั้ง
+      if (P.blessing && Math.random() < 0.6) answer += "\n\n" + P.blessing;
+      return { answer, matched };
+    }
+
+    let busy = false;
+    function ask(text) {
+      if (busy || !text.trim()) return;
+      busy = true;
+      addMsg(text, "me");
+      input.value = "";
+      const typing = addMsg("", "them");
+      typing.innerHTML = '<span class="typing"><i></i><i></i><i></i></span>';
+
+      const finishLocal = () => {
+        const { answer, matched } = reply(text);
+        typing.textContent = answer;
+        lastAnswer = answer;
+        if (matched) {
+          const tag = document.createElement("div");
+          tag.className = "msg sys";
+          tag.textContent = `🔮 องค์ท่านหยั่งรู้ว่าเจ้าถามเรื่อง "${matched.label}"`;
+          chatBody.insertBefore(tag, typing);
+        }
+        chatBody.scrollTop = chatBody.scrollHeight;
+        busy = false;
+      };
+
+      if (aiEnabled) {
+        // โหมด AI จริง: ส่งไป Claude API ผ่าน backend — ถ้าพลาดให้ fallback engine ในเครื่อง
+        replyViaApi(text).then(answer => {
+          typing.textContent = answer;
+          lastAnswer = answer;
+          chatBody.scrollTop = chatBody.scrollHeight;
+          busy = false;
+        }).catch(finishLocal);
+      } else {
+        setTimeout(finishLocal, 1100 + Math.random() * 900);
+      }
+    }
+
+    // ---------- แชร์คำทำนาย (viral loop) ----------
+    let lastAnswer = "";
+    document.getElementById("btn-share").onclick = async () => {
+      const text = `🔮 คำทำนายจาก${P ? P.name : "ร่างทรง Medium"}\n\n${lastAnswer || "ลองถามองค์ท่านดูก่อนนะ"}\n\n— ดูดวงกับร่างทรง AI ได้ที่ ${location.origin + location.pathname}`;
+      try {
+        if (navigator.share) { await navigator.share({ text }); return; }
+        await navigator.clipboard.writeText(text);
+        addMsg("ระบบ: คัดลอกคำทำนายแล้ว 📋 นำไปแชร์ต่อได้เลย", "sys");
+      } catch (e) { /* ผู้ใช้กดยกเลิกแชร์ — ไม่ต้องทำอะไร */ }
+    };
+
+    document.getElementById("m-send").onclick = () => ask(input.value);
+    input.addEventListener("keydown", e => { if (e.key === "Enter") ask(input.value); });
+    document.getElementById("quick-chips").addEventListener("click", e => {
+      const c = e.target.closest(".chip");
+      if (c) ask(c.dataset.q);
+    });
+
+    // ---------- ออกจากร่าง ----------
+    document.getElementById("btn-leave").onclick = () => {
+      addMsg(P.closing || "องค์ท่านเสด็จกลับแล้ว", "them");
+      addMsg("🕯️ องค์ท่านออกจากร่างแล้ว — กราบขอบพระคุณ", "sys");
+      leaveTimer = setTimeout(() => {
+        document.getElementById("step-chat").hidden = true;
+        document.getElementById("step-select").hidden = false;
+        location.hash = "";
+        window.scrollTo({ top: 0 });
+      }, 2200);
+    };
+  </script>
+</body>
+</html>
