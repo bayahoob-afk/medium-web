@@ -38,6 +38,7 @@
       <h2 id="chat-title">หมอดูทิพย์</h2>
       <p id="chat-sub"></p>
     </div>
+    <div class="tool-box" id="tool-box" hidden></div>
     <div class="medium-layout">
       <div class="chat-panel medium-chat">
         <div class="chat-head" id="chat-head">💬 สนทนากับหมอดูทิพย์</div>
@@ -162,6 +163,184 @@
       addMsg("🕯️ เชื่อมต่อสำเร็จ พร้อมรับคำถามแล้ว", "sys");
       history = [{ role: "assistant", content: P.greeting }]; // เริ่มบริบทใหม่ทุกครั้งที่เปิดร่าง
       setTimeout(() => addMsg(P.greeting, "them"), 700);
+      renderTool();
+    }
+
+    // ---------- เครื่องมือประจำศาสตร์ (เฟสแรก: ไพ่ / เลขศาสตร์ / วันเกิดโหราไทย / นักษัตรจีน) ----------
+    const TAROT_DECK = [
+      { n: "The Fool", m: "การเริ่มต้นใหม่ด้วยใจบริสุทธิ์ กล้าออกเดินโดยไม่รู้ปลายทาง" },
+      { n: "The Magician", m: "เจ้ามีเครื่องมือครบในมือแล้ว ลงมือได้เลย" },
+      { n: "The High Priestess", m: "ฟังสัญชาตญาณ ความจริงบางอย่างยังซ่อนอยู่" },
+      { n: "The Empress", m: "ความอุดมสมบูรณ์ การดูแลเอาใจใส่ ผลจะงอกงาม" },
+      { n: "The Emperor", m: "ระเบียบวินัยและความมั่นคงคือกุญแจช่วงนี้" },
+      { n: "The Hierophant", m: "ผู้ใหญ่หรือครูบาอาจารย์จะช่วยชี้ทาง อย่าดื้อทำคนเดียว" },
+      { n: "The Lovers", m: "ทางเลือกของหัวใจ จงเลือกด้วยค่านิยมที่แท้ของตน" },
+      { n: "The Chariot", m: "เดินหน้าด้วยความมุ่งมั่น ชัยชนะต้องคุมบังเหียนให้ดี" },
+      { n: "Strength", m: "ความอ่อนโยนชนะความแข็งกร้าว คุมใจตัวเองให้ได้" },
+      { n: "The Hermit", m: "ถอยมาอยู่กับตัวเองสักพัก คำตอบอยู่ในความเงียบ" },
+      { n: "Wheel of Fortune", m: "วงล้อชะตากำลังหมุน จังหวะใหม่กำลังมา เตรียมรับให้ทัน" },
+      { n: "Justice", m: "ความยุติธรรมจะปรากฏ ทำทุกอย่างให้ตรงไปตรงมา" },
+      { n: "The Hanged Man", m: "มองมุมกลับ สิ่งที่ดูติดขัดคือการรอจังหวะที่ใช่" },
+      { n: "Death", m: "การสิ้นสุดของวัฏจักรเก่าเพื่อเปิดทางสิ่งใหม่ มิใช่เรื่องร้าย" },
+      { n: "Temperance", m: "ความพอดีและการประสาน อย่าสุดโต่งไปทางใดทางหนึ่ง" },
+      { n: "The Devil", m: "ระวังพันธนาการที่ตนสร้างเอง ทั้งนิสัย ความเคยชิน หรือคนที่ฉุดรั้ง" },
+      { n: "The Tower", m: "การเปลี่ยนแปลงฉับพลันที่ปลดปล่อยเจ้าจากรากฐานที่ไม่มั่นคง" },
+      { n: "The Star", m: "ความหวังกลับมาแล้ว ดวงกำลังฟื้นตัว เดินต่อด้วยศรัทธา" },
+      { n: "The Moon", m: "อย่าเพิ่งเชื่อทุกอย่างที่เห็น ความคลุมเครือต้องรอให้กระจ่าง" },
+      { n: "The Sun", m: "ความสำเร็จและความสดใส พลังชีวิตเต็มเปี่ยม" },
+      { n: "Judgement", m: "เสียงเรียกให้ตื่นและให้อภัยอดีต โอกาสฟื้นคืนครั้งสำคัญ" },
+      { n: "The World", m: "วัฏจักรหนึ่งสมบูรณ์แล้ว ฉลองความสำเร็จก่อนเริ่มบทใหม่" }
+    ];
+    const ORACLE_DECK = [
+      { n: "Moon Child", m: "จักรวาลขอให้เจ้าอ่อนโยนกับตัวเองก่อนสิ่งใด" },
+      { n: "Divine Timing", m: "สิ่งที่รอจะมาถึงในเวลาที่เหมาะ อย่าฝืนเร่งจังหวะฟ้า" },
+      { n: "Inner Light", m: "แสงในตัวเจ้ายังไม่ดับ แค่ถูกความเหนื่อยบังไว้" },
+      { n: "Letting Go", m: "มือที่กำแน่นรับของใหม่ไม่ได้ ปล่อยสิ่งที่หมดหน้าที่ลงเถิด" },
+      { n: "Guardian", m: "มีพลังงานคุ้มครองอยู่ข้างเจ้า เดินหน้าได้อย่างอุ่นใจ" },
+      { n: "New Dawn", m: "รุ่งอรุณใหม่กำลังขึ้น เรื่องที่ค้างคาจะเริ่มคลี่คลาย" },
+      { n: "Healing Waters", m: "ถึงเวลาเยียวยา พักผ่อน และเติมน้ำให้แก้วของตัวเอง" },
+      { n: "Brave Heart", m: "ความกล้าครั้งเดียวจะเปลี่ยนหลายสิ่ง พูดสิ่งที่ใจอยากพูด" },
+      { n: "Abundance", m: "พลังแห่งความอุดมสมบูรณ์กำลังไหลเข้ามา เปิดใจรับ" },
+      { n: "Crossroads", m: "ทางแยกไม่ใช่ทางตัน ทุกเส้นทางมีบทเรียนของมัน" },
+      { n: "Stillness", m: "คำตอบจะมาในความนิ่ง หยุดถามแล้วฟังสักครู่" },
+      { n: "Kindred Spirit", m: "ดวงวิญญาณที่คล้ายกันกำลังเดินเข้ามาในชีวิตเจ้า" }
+    ];
+    const NUM_MEANING = {
+      1: "เลขดาวอาทิตย์ — ผู้นำ ความสำเร็จด้วยตนเอง เด่นเรื่องการงานใหญ่",
+      2: "เลขดาวจันทร์ — เสน่ห์อ่อนโยน จิตใจละเอียด เหมาะงานที่ใช้ใจ",
+      3: "เลขดาวอังคาร — กล้าหาญ ฝ่าฟัน มีพลังสู้ แต่ต้องคุมความใจร้อน",
+      4: "เลขดาวพุธ — เจรจาค้าขายเป็นเลิศ สื่อสารเก่ง ปรับตัวไว",
+      5: "เลขดาวพฤหัสบดี — ปัญญาและความยุติธรรม มีผู้ใหญ่อุปถัมภ์",
+      6: "เลขดาวศุกร์ — เสน่ห์ การเงิน ศิลปะ ความรักความบันเทิง",
+      7: "เลขดาวเสาร์ — อดทน หนักแน่น สำเร็จช้าแต่มั่นคง ระวังความเครียด",
+      8: "เลขดาวราหู — พลังพลิกผัน โชคแบบก้าวกระโดด ต้องมีสติกำกับ",
+      9: "เลขดาวเกตุ — สิ่งศักดิ์สิทธิ์คุ้มครอง ความสำเร็จและแรงบันดาลใจ"
+    };
+    const THAI_DAYS = [
+      { d: "อาทิตย์", star: "ดาวอาทิตย์ (๑)", lucky: "แดง, โอลด์โรส", avoid: "ฟ้า, น้ำเงิน", trait: "เกิดวันอาทิตย์เป็นคนมีภาวะผู้นำ ใจร้อนแต่จริงใจ รักเกียรติ ทำงานใหญ่ได้ถ้าใจนิ่งพอ" },
+      { d: "จันทร์", star: "ดาวจันทร์ (๒)", lucky: "เหลือง, ขาวนวล", avoid: "แดง", trait: "เกิดวันจันทร์อ่อนโยน ละเอียดอ่อน ช่างเห็นใจคน เสน่ห์อยู่ที่ความนุ่มนวล ระวังคิดมากเกินเหตุ" },
+      { d: "อังคาร", star: "ดาวอังคาร (๓)", lucky: "ชมพู", avoid: "เหลือง, ขาว", trait: "เกิดวันอังคารกล้าหาญ มุ่งมั่น ไม่ยอมแพ้อะไรง่าย ๆ เหมาะกับงานท้าทาย ระวังปะทะเพราะปากไว" },
+      { d: "พุธ", star: "ดาวพุธ (๔)", lucky: "เขียว", avoid: "ชมพู", trait: "เกิดวันพุธเจรจาเก่ง ปรับตัวไว เรียนรู้เร็ว ค้าขายรุ่ง ระวังจับหลายอย่างจนไม่สุดสักทาง" },
+      { d: "พฤหัสบดี", star: "ดาวพฤหัสบดี (๕)", lucky: "ส้ม, แสด", avoid: "ดำ, ม่วงเข้ม", trait: "เกิดวันพฤหัสบดีใฝ่รู้ มีครูบาอาจารย์และผู้ใหญ่คุ้มครอง เป็นที่พึ่งของคนรอบตัว" },
+      { d: "ศุกร์", star: "ดาวศุกร์ (๖)", lucky: "ฟ้า", avoid: "เทา, ดำ", trait: "เกิดวันศุกร์มีเสน่ห์ รักสวยรักงาม การเงินและความรักเด่น ระวังใจอ่อนกับคนไม่จริงใจ" },
+      { d: "เสาร์", star: "ดาวเสาร์ (๗)", lucky: "ดำ, ม่วงเข้ม", avoid: "เขียว", trait: "เกิดวันเสาร์อดทน หนักแน่น ผ่านเรื่องยากได้เสมอ ความสำเร็จมาช้าแต่ยั่งยืน" }
+    ];
+    const ZODIAC = ["ชวด (หนู)", "ฉลู (วัว)", "ขาล (เสือ)", "เถาะ (กระต่าย)", "มะโรง (มังกร)", "มะเส็ง (งู)", "มะเมีย (ม้า)", "มะแม (แพะ)", "วอก (ลิง)", "ระกา (ไก่)", "จอ (สุนัข)", "กุน (หมู)"];
+    const ZODIAC_TRAIT = [
+      "ไหวพริบดี ปรับตัวเก่ง หาโอกาสเจอก่อนใคร", "ขยันอดทน มั่นคง เก็บเงินเก่ง", "กล้าหาญ มีบารมี เกิดมาเพื่อนำ",
+      "สุภาพ ประนีประนอม มีเสน่ห์เมตตามหานิยม", "ทะเยอทะยาน พลังใหญ่ ทำการใหญ่ได้", "ลึกซึ้ง ฉลาดเฉียบ วางแผนเก่ง",
+      "คล่องแคล่ว รักอิสระ มีเสน่ห์ทางคำพูด", "อ่อนโยน มีศิลปะในใจ เป็นที่รักของผู้คน", "ฉลาดแก้ปัญหา มองเกมขาด",
+      "ขยันตรงเวลา ละเอียดรอบคอบ", "ซื่อสัตย์ จงรักภักดี เพื่อนแท้หายาก", "ใจกว้าง โชคด้านความอุดมสมบูรณ์"
+    ];
+
+    const toolBox = document.getElementById("tool-box");
+    let pickedCards = [];
+
+    function renderTool() {
+      pickedCards = [];
+      const id = P.id;
+      if (id === "tarot" || id === "oracle") {
+        const deckName = id === "tarot" ? "ไพ่ยิปซี" : "ไพ่ออราเคิล";
+        toolBox.hidden = false;
+        toolBox.innerHTML = `
+          <h4>🎴 เปิด${deckName}ด้วยมือคุณเอง</h4>
+          <p class="muted">ตั้งจิตนึกถึงเรื่องที่อยากถาม แล้วเลือกไพ่ 3 ใบ — ตำแหน่ง: สถานการณ์ · สิ่งที่ต้องระวัง · คำแนะนำ</p>
+          <div class="card-fan" id="card-fan">${Array.from({ length: 12 }, (_, i) =>
+            `<button class="tcard" data-i="${i}">🂠</button>`).join("")}</div>
+          <p class="muted tc" id="pick-status">เลือกแล้ว 0/3 ใบ</p>`;
+        const deck = id === "tarot" ? TAROT_DECK : ORACLE_DECK;
+        // สับไพ่: สุ่มลำดับสำรับจริงไว้หลังไพ่คว่ำทั้ง 12 ใบ
+        const shuffled = [...deck].sort(() => Math.random() - 0.5).slice(0, 12);
+        toolBox.querySelector("#card-fan").addEventListener("click", e => {
+          const b = e.target.closest(".tcard");
+          if (!b || b.classList.contains("flip") || pickedCards.length >= 3) return;
+          const card = shuffled[+b.dataset.i];
+          b.classList.add("flip");
+          b.textContent = card.n;
+          pickedCards.push(card);
+          toolBox.querySelector("#pick-status").textContent = `เลือกแล้ว ${pickedCards.length}/3 ใบ`;
+          if (pickedCards.length === 3) setTimeout(readCards, 600);
+        });
+      } else if (id === "numerology") {
+        toolBox.hidden = false;
+        toolBox.innerHTML = `
+          <h4>🔢 ถอดรหัสเลขศาสตร์ของคุณ</h4>
+          <div class="tool-row">
+            <input type="date" id="num-date" aria-label="วันเกิด">
+            <button class="btn btn-gold btn-sm" id="num-date-go">ถอดจากวันเกิด</button>
+          </div>
+          <div class="tool-row">
+            <input type="tel" id="num-phone" placeholder="เบอร์โทร เช่น 0812345678" maxlength="10">
+            <button class="btn btn-purple btn-sm" id="num-phone-go">ถอดจากเบอร์โทร</button>
+          </div>
+          <p class="muted" style="font-size:.78rem">คำนวณในเครื่องของคุณเท่านั้น ไม่ส่งข้อมูลไปที่ใด</p>`;
+        toolBox.querySelector("#num-date-go").onclick = () => {
+          const v = toolBox.querySelector("#num-date").value;
+          if (!v) return;
+          const digits = v.replace(/\D/g, "");
+          numReading(digits, `วันเกิด ${v.split("-").reverse().join("/")}`);
+        };
+        toolBox.querySelector("#num-phone-go").onclick = () => {
+          const v = toolBox.querySelector("#num-phone").value.replace(/\D/g, "");
+          if (v.length < 9) { addMsg("ระบบ: กรอกเบอร์โทรให้ครบก่อนนะ", "sys"); return; }
+          numReading(v, `เบอร์ ${v}`);
+        };
+      } else if (id === "thai-astro") {
+        toolBox.hidden = false;
+        toolBox.innerHTML = `
+          <h4>🗓️ ดูดาวประจำวันเกิดของคุณ</h4>
+          <div class="tool-row">
+            <input type="date" id="thai-date" aria-label="วันเกิด">
+            <button class="btn btn-gold btn-sm" id="thai-go">เปิดตำราวันเกิด</button>
+          </div>`;
+        toolBox.querySelector("#thai-go").onclick = () => {
+          const v = toolBox.querySelector("#thai-date").value;
+          if (!v) return;
+          const info = THAI_DAYS[new Date(v + "T12:00:00").getDay()];
+          postToolReading(`ตำราเปิดแล้ว... เจ้าเกิดวัน${info.d} ใต้อิทธิพล${info.star}\n\n${info.trait}\n\n🎨 สีมงคลของเจ้า: ${info.lucky} · สีที่ควรเลี่ยงตามตำราโบราณ: ${info.avoid}\n\nจงใช้สีมงคลในวันสำคัญ เช่น วันสัมภาษณ์งานหรือนัดแรก แล้วเสริมด้วยการทำบุญในวันเกิดของตนทุกครั้งที่มีโอกาส`);
+        };
+      } else if (id === "chinese-astro") {
+        toolBox.hidden = false;
+        toolBox.innerHTML = `
+          <h4>🐉 เช็กนักษัตรและปีชงของคุณ</h4>
+          <div class="tool-row">
+            <input type="number" id="zo-year" placeholder="ปีเกิด ค.ศ. เช่น 1998" min="1900" max="2030">
+            <button class="btn btn-gold btn-sm" id="zo-go">เปิดดวงนักษัตร</button>
+          </div>
+          <p class="muted" style="font-size:.78rem">* เกิดเดือน ม.ค.–ก.พ. นักษัตรจีนอาจคาบเกี่ยวปีเก่าตามปฏิทินจันทรคติ</p>`;
+        toolBox.querySelector("#zo-go").onclick = () => {
+          const y = +toolBox.querySelector("#zo-year").value;
+          if (!y || y < 1900 || y > 2030) return;
+          const idx = ((y - 4) % 12 + 12) % 12;
+          const clashIdx = (idx + 6) % 12;
+          const nowIdx = ((new Date().getFullYear() - 4) % 12 + 12) % 12;
+          const chong = nowIdx === clashIdx ? "⚠️ ปีนี้เป็นปีชงตรงของเจ้า — ควรไหว้ไท้ส่วยเอี๊ยต้นปี ทำบุญสม่ำเสมอ และเลี่ยงการตัดสินใจใหญ่แบบหุนหัน" : nowIdx === idx ? "ปีนี้เป็นปีนักษัตรของเจ้าเอง (ชงตัวเอง) — ตั้งสติกับการเปลี่ยนแปลง แล้วจะกลายเป็นปีแห่งการเติบโต" : "ปีนี้มิใช่ปีชงตรงของเจ้า เดินหน้าตามแผนได้ แต่หมั่นสะสมบุญไว้เป็นทุน";
+          postToolReading(`เจ้าเกิดปีนักษัตร ${ZODIAC[idx]}\n\n${ZODIAC_TRAIT[idx]}\n\nนักษัตรคู่ชงของเจ้าคือปี${ZODIAC[clashIdx]} — ${chong}`);
+        };
+      } else {
+        toolBox.hidden = true;
+        toolBox.innerHTML = "";
+      }
+    }
+
+    function numReading(digits, label) {
+      const total = digits.split("").reduce((s, d) => s + +d, 0);
+      let root = total;
+      while (root > 9) root = String(root).split("").reduce((s, d) => s + +d, 0);
+      postToolReading(`ครูถอดรหัส${label}ให้แล้ว\n\nผลรวมทั้งหมดได้ ${total} หลอมเหลือฐานราก คือเลข ${root}\n\n${NUM_MEANING[root]}\n\nจงใช้จุดแข็งของเลขนี้ให้เต็มที่ และหากตัวเลขแวดล้อม เช่น เบอร์โทร มีเลขคู่ศัตรูปะปนมาก ให้ถือว่าเป็นสัญญาณให้เจ้ามีสติกับด้านนั้นเป็นพิเศษ มิใช่คำตัดสินตายตัว`);
+    }
+
+    function readCards() {
+      const pos = ["สถานการณ์ของเจ้า", "สิ่งที่ต้องระวัง", "คำแนะนำจากไพ่"];
+      const lines = pickedCards.map((c, i) => `${i + 1}. ${pos[i]} — ไพ่ ${c.n}: ${c.m}`);
+      postToolReading(`ไพ่ทั้งสามใบที่มือเจ้าเลือกเอง เผยออกมาแล้ว\n\n${lines.join("\n\n")}\n\nจงจดจำไว้ว่าไพ่ชี้ทาง มิได้ขีดชะตา — การกระทำของเจ้าหลังจากนี้ต่างหากที่ลิขิตผลลัพธ์`);
+    }
+
+    function postToolReading(text) {
+      addMsg(text, "them");
+      lastAnswer = text;
+      if (P.blessing) addMsg(P.blessing, "them");
+      chatBody.scrollTop = chatBody.scrollHeight;
     }
 
     // ---------- ตรวจว่ามี backend AI (Claude API) ให้ใช้ไหม ----------

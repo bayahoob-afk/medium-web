@@ -442,3 +442,42 @@ button { font-family: inherit; cursor: pointer; }
   .pkg-row { grid-template-columns: 1fr; }
   .medium-chat { height: 480px; }
 }
+
+/* ---------- เครื่องมือประจำศาสตร์ (หมอดูทิพย์) ---------- */
+.tool-box {
+  background: var(--card, rgba(255,255,255,.04));
+  border: 1px solid var(--line, rgba(230,184,76,.25));
+  border-radius: 16px;
+  padding: 18px 20px;
+  margin-bottom: 20px;
+}
+.tool-box h4 { margin: 0 0 6px; color: var(--gold, #e6b84c); }
+.tool-box .muted { font-size: .85rem; }
+.tool-row { display: flex; gap: 10px; margin: 10px 0; flex-wrap: wrap; }
+.tool-row input {
+  flex: 1; min-width: 180px;
+  background: rgba(0,0,0,.3); color: inherit;
+  border: 1px solid var(--line, rgba(230,184,76,.25));
+  border-radius: 10px; padding: 10px 14px; font: inherit;
+}
+.card-fan {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(74px, 1fr));
+  gap: 10px; margin: 14px 0 8px;
+}
+.tcard {
+  aspect-ratio: 2 / 3;
+  border-radius: 10px;
+  border: 1px solid var(--purple, #8b5cf6);
+  background: linear-gradient(145deg, #2a1548, #12081f);
+  color: var(--gold, #e6b84c);
+  font-size: 1.6rem;
+  cursor: pointer;
+  transition: transform .25s, box-shadow .25s;
+}
+.tcard:hover:not(.flip) { transform: translateY(-6px); box-shadow: 0 8px 18px rgba(139,92,246,.35); }
+.tcard.flip {
+  background: linear-gradient(145deg, #3b2a12, #1f1408);
+  border-color: var(--gold, #e6b84c);
+  font-size: .72rem; font-weight: 600; cursor: default;
+  padding: 4px; word-break: break-word;
+}
