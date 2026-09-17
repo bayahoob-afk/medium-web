@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>ดวงคู่ เช็คความเข้ากัน ฟรี — จากวันเกิดสองคน | Medium</title>
+  <meta name="description" content="เช็คดวงคู่ฟรีจากวันเกิดสองคน คำนวณความเข้ากันตามปีนักษัตรและเลขศาสตร์ พร้อมจุดแข็ง จุดที่ต้องระวัง และคำแนะนำ ใช้ได้ทั้งคู่รัก เพื่อน และคู่ค้าธุรกิจ">
+  <link rel="canonical" href="https://bayahoob-afk.github.io/medium-web/match.html">
+  <meta property="og:title" content="ดวงคู่ เช็คความเข้ากัน ฟรี — จากวันเกิดสองคน">
+  <meta property="og:description" content="ใส่วันเกิดสองคน ระบบคำนวณความเข้ากันตามนักษัตร+เลขศาสตร์ พร้อมคำแนะนำ แชร์ผลเป็นการ์ดได้">
+  <meta property="og:url" content="https://bayahoob-afk.github.io/medium-web/match.html">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔮</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#12081f">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-page="match">
+  <header class="nav" id="app-nav"></header>
+
+  <section class="section container">
+    <div class="section-head">
+      <h2>เช็ค<span class="em">ดวงคู่</span> เข้ากันแค่ไหน?</h2>
+      <p>ใส่วันเกิดสองคน ระบบคำนวณตามปีนักษัตรและเลขศาสตร์ — ใช้ได้ทั้งคู่รัก เพื่อนสนิท และคู่ค้าธุรกิจ</p>
+    </div>
+
+    <div class="wp-layout">
+      <div class="card">
+        <h3 style="margin-top:0">💗 วันเกิดของสองคน</h3>
+        <div class="form-group">
+          <label>วันเกิดของคุณ</label>
+          <input type="date" id="dob-a" style="width:100%;background:rgba(0,0,0,.3);color:inherit;border:1px solid var(--line);border-radius:10px;padding:8px 12px;font:inherit">
+        </div>
+        <div class="form-group">
+          <label>วันเกิดอีกฝ่าย</label>
+          <input type="date" id="dob-b" style="width:100%;background:rgba(0,0,0,.3);color:inherit;border:1px solid var(--line);border-radius:10px;padding:8px 12px;font:inherit">
+        </div>
+        <button class="btn btn-gold" style="width:100%" id="match-go">🔮 เปิดดวงคู่</button>
+        <p class="muted" style="font-size:.8rem;margin-top:12px">
+          คำนวณในเครื่องของคุณเท่านั้น ไม่ส่งข้อมูลไปที่ใด · เพื่อความบันเทิงและกำลังใจ
+          ความสัมพันธ์จริงสร้างด้วยการกระทำของคนสองคน</p>
+      </div>
+
+      <div class="card" id="match-result" hidden>
+        <div class="tc">
+          <div style="font-size:2.6rem" id="mr-emoji">💞</div>
+          <div style="font-size:3rem;font-weight:700" class="gold" id="mr-percent"></div>
+          <h3 id="mr-title" style="margin:4px 0 2px"></h3>
+          <p class="muted" style="font-size:.85rem" id="mr-pair"></p>
+        </div>
+        <p id="mr-strength" style="margin:12px 0 6px"></p>
+        <p id="mr-caution" style="margin:6px 0"></p>
+        <p id="mr-advice" style="margin:6px 0 14px"></p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn btn-purple btn-sm" id="mr-card">🖼️ แชร์ผลเป็นการ์ด</button>
+          <a class="btn btn-gold btn-sm" href="seers.html">💘 ปรึกษาหมอดูสายรักตัวจริง</a>
+          <a class="btn btn-ghost btn-sm" href="medium.html#trimurti-love">🕯️ ขอพรหมอดูทิพย์สายรัก</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer" id="app-footer"></footer>
+
+  <script src="assets/js/app.js"></script>
+  <script src="assets/js/daily.js"></script>
+  <script src="assets/js/sharecard.js"></script>
+  <script>
+    const ZODIAC = ["ชวด (หนู)", "ฉลู (วัว)", "ขาล (เสือ)", "เถาะ (กระต่าย)", "มะโรง (มังกร)", "มะเส็ง (งู)", "มะเมีย (ม้า)", "มะแม (แพะ)", "วอก (ลิง)", "ระกา (ไก่)", "จอ (สุนัข)", "กุน (หมู)"];
+    // คู่สมพงศ์ (มิตรแท้ตามตำรานักษัตรจีน) และกลุ่มตรีมิตร (ห่างกัน 4 ปี)
+    const SOULMATE_PAIRS = [[0, 1], [2, 11], [3, 10], [4, 9], [5, 8], [6, 7]];
+
+    function zodiacIdx(dob) { const y = +dob.slice(0, 4); return ((y - 4) % 12 + 12) % 12; }
+    function numRoot(dob) {
+      let n = dob.replace(/\D/g, "").split("").reduce((a, c) => a + +c, 0);
+      while (n > 9) n = String(n).split("").reduce((a, c) => a + +c, 0);
+      return n;
+    }
+    function hash(s) { let h = 5381; for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) >>> 0; return h; }
+
+    function analyze(a, b) {
+      const [d1, d2] = [a, b].sort(); // สลับลำดับได้ผลเดิม
+      const z1 = zodiacIdx(d1), z2 = zodiacIdx(d2);
+      const r1 = numRoot(d1), r2 = numRoot(d2);
+      let score = 55 + (hash(d1 + "|" + d2) % 21); // ฐาน 55-75 คงที่ต่อคู่
+      let zNote = "";
+      if (SOULMATE_PAIRS.some(([x, y]) => (x === z1 && y === z2) || (x === z2 && y === z1))) {
+        score += 18; zNote = "นักษัตรของสองคนเป็น \"คู่สมพงศ์\" — คู่มิตรแท้ตามตำรา ยิ่งอยู่ใกล้ยิ่งหนุนกัน";
+      } else if (z1 === z2) {
+        score += 8; zNote = "เกิดปีนักษัตรเดียวกัน — เข้าใจนิสัยกันง่าย แต่ระวังนิสัยเหมือนกันชนกันเอง";
+      } else if (z1 % 4 === z2 % 4) {
+        score += 12; zNote = "นักษัตรอยู่กลุ่มตรีมิตรเดียวกัน — จังหวะชีวิตไปทางเดียวกัน ทำงานร่วมกันลื่น";
+      } else if ((z1 + 6) % 12 === z2) {
+        score -= 14; zNote = "นักษัตรเป็นคู่ชงกันตามตำรา — ไม่ได้แปลว่าอยู่กันไม่ได้ แต่ต้องใช้ความเข้าใจมากกว่าคู่อื่น";
+      } else {
+        zNote = "นักษัตรของสองคนเป็นกลางต่อกัน — ไม่หนุนไม่ชน ขึ้นกับการปรับตัวล้วน ๆ";
+      }
+      const sumRoot = ((r1 + r2 - 1) % 9) + 1;
+      if (r1 === r2) score += 4;
+      score = Math.max(38, Math.min(97, score));
+      const tier = score >= 85 ? ["💞", "คู่บุญหนุนดวง"] : score >= 70 ? ["💕", "เข้ากันได้ดี"] :
+        score >= 55 ? ["🤝", "ปรับจูนกันได้"] : ["🌗", "ต่างขั้วที่ต้องเข้าใจกัน"];
+      const STR = {
+        1: "พลังของคู่นี้คือความกล้าเริ่มต้น — เหมาะลุยเป้าหมายใหม่ด้วยกัน",
+        2: "พลังของคู่นี้คือความละมุนและการประคับประคอง — อยู่ด้วยแล้วใจเย็นลง",
+        3: "พลังของคู่นี้คือการสื่อสารและเสียงหัวเราะ — คุยกันได้ไม่มีเบื่อ",
+        4: "พลังของคู่นี้คือความมั่นคง — วางแผนระยะยาวด้วยกันแล้วสำเร็จ",
+        5: "พลังของคู่นี้คืออิสระและการผจญภัย — พากันไปเห็นโลกกว้าง",
+        6: "พลังของคู่นี้คือความรักการดูแล — บ้านของสองคนจะอบอุ่นเสมอ",
+        7: "พลังของคู่นี้คือความลึกซึ้ง — เข้าใจกันโดยไม่ต้องพูดเยอะ",
+        8: "พลังของคู่นี้คือความทะเยอทะยาน — จับมือกันสร้างฐานะได้จริง",
+        9: "พลังของคู่นี้คือเมตตาบารมี — ช่วยเหลือคนอื่นด้วยกันแล้วดวงยิ่งเปิด"
+      };
+      return {
+        score, emoji: tier[0], title: tier[1],
+        pair: `${ZODIAC[zodiacIdx(a)]} × ${ZODIAC[zodiacIdx(b)]} · เลขคู่ ${sumRoot}`,
+        strength: "✨ " + STR[sumRoot],
+        caution: "⚖️ " + zNote,
+        advice: score >= 70
+          ? "🌟 คำแนะนำ: ดวงหนุนอยู่แล้ว อย่าลืมเติมคำขอบคุณเล็ก ๆ ให้กันทุกวัน สิ่งดีจะยิ่งงอกงาม"
+          : "🌟 คำแนะนำ: นัดคุยกันตรง ๆ สัปดาห์ละครั้งโดยไม่มีมือถือ ความต่างจะกลายเป็นจุดแข็งของทีม"
+      };
+    }
+
+    const dobA = document.getElementById("dob-a"), dobB = document.getElementById("dob-b");
+    const profile = window.MEDIUM_DAILY.getProfile();
+    if (profile && profile.dob) dobA.value = profile.dob;
+    let lastResult = null;
+
+    document.getElementById("match-go").onclick = () => {
+      if (!dobA.value || !dobB.value) return;
+      const r = analyze(dobA.value, dobB.value);
+      lastResult = r;
+      document.getElementById("mr-emoji").textContent = r.emoji;
+      document.getElementById("mr-percent").textContent = r.score + "%";
+      document.getElementById("mr-title").textContent = r.title;
+      document.getElementById("mr-pair").textContent = r.pair;
+      document.getElementById("mr-strength").textContent = r.strength;
+      document.getElementById("mr-caution").textContent = r.caution;
+      document.getElementById("mr-advice").textContent = r.advice;
+      document.getElementById("match-result").hidden = false;
+    };
+
+    document.getElementById("mr-card").onclick = () => {
+      if (!lastResult) return;
+      const r = lastResult;
+      const canvas = MEDIUM_CARD.drawReadingCard({
+        source: "ดวงคู่",
+        text: `${r.emoji} ความเข้ากัน ${r.score}% — ${r.title}\n\n${r.pair}\n\n${r.strength}\n\n${r.caution}`
+      });
+      MEDIUM_CARD.share(canvas, "medium-match.png", "🔮 ดวงคู่ของเราจาก Medium — ลองเช็คของคุณฟรี");
+    };
+  </script>
+</body>
+</html>

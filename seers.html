@@ -56,6 +56,17 @@
     const noResult = document.getElementById("no-result");
     let activeCraft = "ทั้งหมด";
 
+    // ---------- หมอดูคนโปรด + ประวัติการจอง (localStorage ในเครื่องผู้ใช้เท่านั้น) ----------
+    function lsArr(k) { try { return JSON.parse(localStorage.getItem(k)) || []; } catch (e) { return []; } }
+    function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+    const favs = () => lsArr("medium_fav_seers");
+    const bookedIds = () => lsArr("medium_bookings").map(b => b.seerId);
+    function toggleFav(id) {
+      const f = favs();
+      lsSet("medium_fav_seers", f.includes(id) ? f.filter(x => x !== id) : [...f, id]);
+      render();
+    }
+
     // ศาสตร์ → หมอดูทิพย์ประจำศาสตร์ (fallback เมื่อหมอดูไม่ว่าง)
     const CRAFT_PERSONA = {
       "ไพ่ยิปซี": "tarot", "โหราศาสตร์ไทย": "thai-astro", "เลข 7 ตัว 9 ฐาน": "numerology",
@@ -65,7 +76,7 @@
     };
 
     // สร้างชิปฟิลเตอร์จากศาสตร์ที่มีจริงในข้อมูล
-    const crafts = ["ทั้งหมด", ...new Set(window.SEERS.map(s => s.craft))];
+    const crafts = ["ทั้งหมด", "❤️ คนโปรด", ...new Set(window.SEERS.map(s => s.craft))];
     chipsWrap.innerHTML = crafts.map(c =>
       `<button class="chip ${c === "ทั้งหมด" ? "active" : ""}" data-craft="${c}">${c}</button>`).join("");
     chipsWrap.addEventListener("click", e => {
@@ -79,21 +90,26 @@
 
     function render() {
       const q = searchEl.value.trim().toLowerCase();
-      const list = window.SEERS.filter(s => {
-        const matchCraft = activeCraft === "ทั้งหมด" || s.craft === activeCraft;
+      const favSet = favs(), bookedSet = bookedIds();
+      let list = window.SEERS.filter(s => {
+        const matchCraft = activeCraft === "ทั้งหมด" || activeCraft === "❤️ คนโปรด" && favSet.includes(s.id) || s.craft === activeCraft;
         const hay = (s.name + s.craft + s.crafts.join(" ") + s.specialty + s.bio).toLowerCase();
         return matchCraft && (!q || hay.includes(q));
       });
+      // คนโปรดขึ้นก่อนเสมอ — ลูกค้าประจำหาเจอไว
+      list = [...list].sort((a, b) => favSet.includes(b.id) - favSet.includes(a.id));
       noResult.hidden = list.length > 0;
       grid.innerHTML = list.map(s => `
         <div class="seer-card" id="${s.id}">
+          <button class="fav-btn ${favSet.includes(s.id) ? "active" : ""}" data-fav="${s.id}"
+            title="หมอดูคนโปรด" aria-label="หมอดูคนโปรด">${favSet.includes(s.id) ? "❤️" : "🤍"}</button>
           <div class="seer-top">
             <div class="avatar">${s.emoji}</div>
             <div>
               <div class="seer-name">${s.name}</div>
               <div class="seer-title">
                 ${s.online ? '<span class="online-dot"></span>ออนไลน์' : '<span class="offline-dot"></span>ออฟไลน์'}
-                · ${s.exp} ปี
+                · ${s.exp} ปี${bookedSet.includes(s.id) ? ' · <span class="gold">⭐ เคยจอง</span>' : ""}
               </div>
             </div>
           </div>
@@ -109,6 +125,10 @@
           </div>
         </div>`).join("");
       updateTipya(list);
+      grid.querySelectorAll("[data-fav]").forEach(b => b.onclick = e => {
+        e.stopPropagation();
+        toggleFav(b.dataset.fav);
+      });
     }
 
     // ปรับการ์ดหมอดูทิพย์ตามศาสตร์ที่เลือก และเด่นขึ้นเมื่อไม่มีหมอดูออนไลน์
@@ -191,6 +211,25 @@
         <div class="row total"><span>ยอดชำระ</span><b>฿${price.toLocaleString()}</b></div>`;
     }
 
+    // สร้างไฟล์ .ics ให้ผู้ใช้เพิ่มนัดลงปฏิทินมือถือ — กันลืมนัดหมอดู
+    function downloadIcs(date, time, topic) {
+      const [h, m] = time.split(":").map(Number);
+      const start = new Date(date + "T" + time + ":00");
+      const end = new Date(start.getTime() + currentPkg * 60000);
+      const fmt = d => d.getFullYear() + String(d.getMonth() + 1).padStart(2, "0") + String(d.getDate()).padStart(2, "0") +
+        "T" + String(d.getHours()).padStart(2, "0") + String(d.getMinutes()).padStart(2, "0") + "00";
+      const ics = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Medium//TH", "BEGIN:VEVENT",
+        "UID:" + Date.now() + "@medium", "DTSTART:" + fmt(start), "DTEND:" + fmt(end),
+        "SUMMARY:🔮 นัดดูดวงกับ" + currentSeer.name,
+        "DESCRIPTION:เรื่องที่ถาม: " + topic.replace(/[\n,;]/g, " ") + " · เข้าเซสชันที่ " + location.origin + location.pathname.replace(/[^/]*$/, "") + "session.html",
+        "BEGIN:VALARM", "TRIGGER:-PT30M", "ACTION:DISPLAY", "DESCRIPTION:อีก 30 นาทีถึงนัดดูดวง", "END:VALARM",
+        "END:VEVENT", "END:VCALENDAR"].join("\r\n");
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(new Blob([ics], { type: "text/calendar" }));
+      a.download = "medium-booking.ics";
+      document.body.appendChild(a); a.click(); a.remove();
+    }
+
     function confirmBooking() {
       const date = body.querySelector("#bk-date").value;
       const time = body.querySelector("#bk-time").value;
@@ -203,6 +242,9 @@
           price: currentPkg * currentSeer.pricePerMin, date, time, topic
         }));
       } catch (e) { /* private mode: ไปต่อได้ หน้าเซสชันมีค่า default */ }
+      // ประวัติการจองข้าม session (สำหรับ badge "เคยจอง" และการจองซ้ำ)
+      lsSet("medium_bookings", [{ seerId: currentSeer.id, date, time, at: new Date().toISOString() },
+        ...lsArr("medium_bookings")].slice(0, 20));
       body.innerHTML = `
         <div class="tc" style="padding:20px 0">
           <div style="font-size:3.4rem">✅</div>
@@ -213,11 +255,14 @@
             เงินของคุณพักไว้ในระบบอย่างปลอดภัยแล้ว
           </p>
           <a href="session.html" class="btn btn-purple mt-2">🎥 เข้าเซสชันเลย (เดโม)</a>
+          <button class="btn btn-ghost btn-sm mt-2" id="bk-ics">📅 เพิ่มนัดลงปฏิทิน + เตือนก่อน 30 นาที</button>
           <p class="muted" style="font-size:.85rem;margin-top:14px">
             ระหว่างรอถึงเวลานัด —
             <a href="medium.html${CRAFT_PERSONA[currentSeer.craft] ? "#" + CRAFT_PERSONA[currentSeer.craft] : ""}" class="gold">คุยกับหมอดูทิพย์${currentSeer.craft}ก่อนได้ ฟรี →</a>
           </p>
         </div>`;
+      body.querySelector("#bk-ics").onclick = () => downloadIcs(date, time, topic);
+      render(); // อัปเดต badge "เคยจอง" บนการ์ดทันที
     }
   </script>
 </body>

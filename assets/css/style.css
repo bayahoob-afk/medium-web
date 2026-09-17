@@ -498,3 +498,8 @@ button { font-family: inherit; cursor: pointer; }
 /* วอลเปเปอร์เสริมดวง */
 .wp-layout { display: grid; grid-template-columns: 1.4fr 1fr; gap: 20px; align-items: start; }
 @media (max-width: 760px) { .wp-layout { grid-template-columns: 1fr; } }
+
+/* ปุ่มหมอดูคนโปรด */
+.seer-card { position: relative; }
+.fav-btn { position: absolute; top: 14px; right: 14px; background: none; border: none; font-size: 1.25rem; cursor: pointer; opacity: .75; transition: transform .15s, opacity .15s; }
+.fav-btn:hover, .fav-btn.active { opacity: 1; transform: scale(1.15); }
