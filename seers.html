@@ -22,6 +22,15 @@
 
     <div class="filter-bar">
       <input type="text" id="search" class="search-input" placeholder="🔍 ค้นหาชื่อหมอดู ศาสตร์ หรือความเชี่ยวชาญ...">
+      <select id="sort-sel" class="search-input" style="flex:0 0 auto;min-width:180px" aria-label="เรียงลำดับ">
+        <option value="recommend">✨ แนะนำ</option>
+        <option value="online">🟢 ออนไลน์ก่อน</option>
+        <option value="rating">⭐ เรตติ้งสูงสุด</option>
+        <option value="reviews">💬 รีวิวมากสุด</option>
+        <option value="price-asc">฿ ราคาต่ำ → สูง</option>
+        <option value="price-desc">฿ ราคาสูง → ต่ำ</option>
+        <option value="exp">🎓 ประสบการณ์มากสุด</option>
+      </select>
       <div id="craft-chips" style="display:flex;gap:8px;flex-wrap:wrap"></div>
     </div>
 
@@ -87,6 +96,8 @@
       render();
     });
     searchEl.addEventListener("input", render);
+    const sortEl = document.getElementById("sort-sel");
+    sortEl.addEventListener("change", render);
 
     function render() {
       const q = searchEl.value.trim().toLowerCase();
@@ -96,8 +107,17 @@
         const hay = (s.name + s.craft + s.crafts.join(" ") + s.specialty + s.bio).toLowerCase();
         return matchCraft && (!q || hay.includes(q));
       });
-      // คนโปรดขึ้นก่อนเสมอ — ลูกค้าประจำหาเจอไว
-      list = [...list].sort((a, b) => favSet.includes(b.id) - favSet.includes(a.id));
+      // เรียงลำดับตามที่เลือก — "แนะนำ" = คนโปรดก่อน แล้วออนไลน์ แล้วเรตติ้ง
+      const cmp = {
+        "recommend": (a, b) => (favSet.includes(b.id) - favSet.includes(a.id)) || (b.online - a.online) || (b.rating - a.rating),
+        "online": (a, b) => (b.online - a.online) || (b.rating - a.rating),
+        "rating": (a, b) => (b.rating - a.rating) || (b.reviews - a.reviews),
+        "reviews": (a, b) => b.reviews - a.reviews,
+        "price-asc": (a, b) => a.pricePerMin - b.pricePerMin,
+        "price-desc": (a, b) => b.pricePerMin - a.pricePerMin,
+        "exp": (a, b) => b.exp - a.exp
+      }[sortEl.value] || ((a, b) => 0);
+      list = [...list].sort(cmp);
       noResult.hidden = list.length > 0;
       grid.innerHTML = list.map(s => `
         <div class="seer-card" id="${s.id}">

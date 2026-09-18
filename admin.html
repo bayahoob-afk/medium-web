@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>แอดมินแพลตฟอร์ม (เดโม) | Medium</title>
+  <meta name="description" content="หลังบ้านทีมงานแพลตฟอร์ม Medium — อนุมัติหมอดูใหม่ จัดการข้อร้องเรียนและคืนเงิน มอนิเตอร์ความปลอดภัย (เวอร์ชันสาธิต)">
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#12081f">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <style>
+    .dash-sec-title { font-size: 1.15rem; margin: 34px 0 14px; }
+    .dash-sec-title .em { color: var(--gold); }
+    .stat-card .num { font-size: 1.7rem; font-weight: 700; color: var(--gold); margin: 6px 0 2px; }
+    .stat-card .sub { font-size: .78rem; color: var(--text-faint); }
+    .table-wrap { overflow-x: auto; background: var(--bg-card); border: 1px solid var(--line); border-radius: var(--radius); }
+    .dash-table { width: 100%; border-collapse: collapse; font-size: .88rem; min-width: 640px; }
+    .dash-table th, .dash-table td { text-align: left; padding: 12px 16px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    .dash-table th { color: var(--text-faint); font-weight: 500; font-size: .8rem; }
+    .dash-table tr:last-child td { border-bottom: 0; }
+    .badge-ok { background: rgba(52, 211, 153, .12); color: var(--ok); border-color: rgba(52, 211, 153, .35); }
+    .badge-danger { background: rgba(248, 113, 113, .12); color: var(--danger); border-color: rgba(248, 113, 113, .4); }
+  </style>
+</head>
+<body data-page="admin">
+  <header class="nav" id="app-nav"></header>
+
+  <section class="section container">
+    <div class="section-head" style="margin-bottom:20px">
+      <h2>🛡️ แอดมิน<span class="em">แพลตฟอร์ม</span></h2>
+      <p>หลังบ้านทีมงาน Medium — เวอร์ชันสาธิต ข้อมูลเป็นตัวอย่าง
+        (ระบบจริงหน้านี้ต้องล็อกอินสิทธิ์แอดมินเท่านั้น)</p>
+    </div>
+
+    <!-- 1) ภาพรวมแพลตฟอร์ม -->
+    <div class="grid grid-4" id="admin-stats"></div>
+
+    <!-- 2) ใบสมัครหมอดูรอตรวจ -->
+    <h3 class="dash-sec-title">📝 ใบสมัครหมอดู<span class="em">รอตรวจ</span></h3>
+    <div class="table-wrap">
+      <table class="dash-table">
+        <thead><tr><th>ผู้สมัคร</th><th>ศาสตร์</th><th>ประสบการณ์</th><th>สถานะ</th><th>จัดการ</th></tr></thead>
+        <tbody id="apps-body"></tbody>
+      </table>
+    </div>
+    <p class="muted" style="font-size:.78rem;margin-top:8px">
+      ใบสมัครจากหน้า <a href="join-seer.html" class="gold">สมัครเป็นหมอดู</a> ในเครื่องนี้จะโผล่ที่นี่ด้วย ·
+      ขั้นตอนจริง: ตรวจใบสมัคร → นัดสัมภาษณ์+ทดสอบพยากรณ์ → KYC → เปิดร้าน</p>
+
+    <!-- 3) ข้อร้องเรียน & คืนเงิน -->
+    <h3 class="dash-sec-title">⚖️ ข้อร้องเรียน & <span class="em">คำขอคืนเงิน</span></h3>
+    <div class="table-wrap">
+      <table class="dash-table">
+        <thead><tr><th>วันที่</th><th>เรื่อง</th><th>ยอดเงิน</th><th>สถานะ</th><th>จัดการ</th></tr></thead>
+        <tbody id="cases-body"></tbody>
+      </table>
+    </div>
+
+    <!-- 4) ความปลอดภัย -->
+    <h3 class="dash-sec-title">🚨 การแจ้งเตือน<span class="em">ความปลอดภัย</span></h3>
+    <div class="table-wrap">
+      <table class="dash-table">
+        <thead><tr><th>เวลา</th><th>เหตุการณ์</th><th>ระดับ</th><th>จัดการ</th></tr></thead>
+        <tbody id="safety-body"></tbody>
+      </table>
+    </div>
+    <p class="muted" style="font-size:.78rem;margin-top:8px">
+      ระบบจริง: ตัวกรองแชท/วิดีโอตรวจจับการแลกช่องทางติดต่อส่วนตัว การเรียกเก็บเงินนอกระบบ
+      และคำแนะนำอันตราย (การแพทย์/การเงิน) อัตโนมัติ แล้วส่งให้ทีมคนตรวจ</p>
+  </section>
+
+  <footer class="footer" id="app-footer"></footer>
+
+  <script src="assets/js/app.js"></script>
+  <script>
+    const baht = n => "฿" + n.toLocaleString("th-TH");
+
+    // ---------- 1) ภาพรวม (mock) ----------
+    const gmv = 412500, fee = Math.round(gmv * 0.2), wht = Math.round((gmv - fee) * 0.03);
+    document.getElementById("admin-stats").innerHTML = `
+      <div class="card stat-card"><h3>💰 ยอดขายรวม (GMV) เดือนนี้</h3>
+        <div class="num">${baht(gmv)}</div><div class="sub">1,375 เซสชัน · หมอดู 11 คน</div></div>
+      <div class="card stat-card"><h3>🏦 รายได้แพลตฟอร์ม (20%)</h3>
+        <div class="num">${baht(fee)}</div><div class="sub">ก่อนหักค่าใช้จ่ายระบบ</div></div>
+      <div class="card stat-card"><h3>🧾 ภาษีหัก ณ ที่จ่ายนำส่ง</h3>
+        <div class="num">${baht(wht)}</div><div class="sub">3% ของยอดจ่ายหมอดู · ยื่น ภ.ง.ด.3 รายเดือน</div></div>
+      <div class="card stat-card"><h3>⚖️ เคสเปิดอยู่</h3>
+        <div class="num" id="open-cases">3</div><div class="sub">ร้องเรียน 2 · คืนเงิน 1 · SLA ตอบใน 24 ชม.</div></div>`;
+
+    // ---------- 2) ใบสมัครหมอดู: mock + ใบสมัครจริงจากหน้า join-seer ในเครื่องนี้ ----------
+    const mockApps = [
+      { name: "แม่หมอนิล ไพ่เงาจันทร์", tools: ["🎴 ไพ่ออราเคิล", "🕯️ อ่านพลังงาน"], exp: 8, status: "" },
+      { name: "อ.ภูมิ ดวงดาว", tools: ["🪐 โหรายูเรเนียน"], exp: 12, status: "" }
+    ];
+    let localApps = [];
+    try { localApps = (JSON.parse(localStorage.getItem("medium_seer_apps")) || []).map(a => ({ ...a, local: true })); } catch (e) { /* private mode */ }
+    const apps = [...localApps, ...mockApps];
+
+    function renderApps() {
+      document.getElementById("apps-body").innerHTML = apps.map((a, i) => `
+        <tr>
+          <td><b>${a.name}</b>${a.local ? ' <span class="badge">จากเครื่องนี้</span>' : ""}</td>
+          <td style="font-size:.8rem">${(a.tools || []).join(" · ")}</td>
+          <td style="white-space:nowrap">${a.exp} ปี</td>
+          <td id="app-st-${i}">${a.status === "approved" ? '<span class="badge badge-ok">✓ ผ่านรอบแรก — นัดสัมภาษณ์</span>'
+            : a.status === "rejected" ? '<span class="badge badge-danger">ไม่ผ่าน</span>'
+            : '<span class="badge">⏳ รอตรวจ</span>'}</td>
+          <td style="white-space:nowrap">
+            ${a.status ? "" : `<button class="btn btn-gold btn-sm" data-app="${i}" data-do="approved">อนุมัติรอบแรก</button>
+            <button class="btn btn-ghost btn-sm" data-app="${i}" data-do="rejected">ปฏิเสธ</button>`}
+          </td>
+        </tr>`).join("");
+      document.querySelectorAll("[data-app]").forEach(b => b.onclick = () => {
+        apps[+b.dataset.app].status = b.dataset.do;
+        renderApps();
+      });
+    }
+    renderApps();
+
+    // ---------- 3) ข้อร้องเรียน & คืนเงิน (mock) ----------
+    const cases = [
+      { d: "วันนี้ 09:12", t: "ขอคืนเงิน — ยกเลิกก่อนนัด 3 ชม. (นัด 19:00 วันนี้)", amt: 750, kind: "refund", status: "" },
+      { d: "เมื่อวาน 21:40", t: "ร้องเรียน — หมอดูชวนไปดูต่อทางไลน์ส่วนตัว (มีภาพแชทแนบ)", amt: 0, kind: "complaint", status: "" },
+      { d: "16 ก.ย. 14:05", t: "ร้องเรียน — เข้าเซสชันช้า 10 นาที ขอชดเชยเวลา", amt: 0, kind: "complaint", status: "" }
+    ];
+    function renderCases() {
+      let open = cases.filter(c => !c.status).length;
+      document.getElementById("open-cases").textContent = open;
+      document.getElementById("cases-body").innerHTML = cases.map((c, i) => `
+        <tr>
+          <td style="white-space:nowrap">${c.d}</td>
+          <td>${c.t}</td>
+          <td style="white-space:nowrap">${c.amt ? baht(c.amt) : "-"}</td>
+          <td>${c.status === "refunded" ? '<span class="badge badge-ok">✓ คืนเงินแล้ว</span>'
+            : c.status === "closed" ? '<span class="badge badge-ok">✓ ปิดเรื่อง</span>'
+            : '<span class="badge">⏳ เปิดอยู่</span>'}</td>
+          <td style="white-space:nowrap">
+            ${c.status ? "" : (c.kind === "refund"
+              ? `<button class="btn btn-gold btn-sm" data-case="${i}" data-do="refunded">อนุมัติคืนเงิน</button>`
+              : `<button class="btn btn-ghost btn-sm" data-case="${i}" data-do="closed">ตรวจแล้ว-ปิดเรื่อง</button>`)}
+          </td>
+        </tr>`).join("");
+      document.querySelectorAll("[data-case]").forEach(b => b.onclick = () => {
+        cases[+b.dataset.case].status = b.dataset.do;
+        renderCases();
+      });
+    }
+    renderCases();
+
+    // ---------- 4) ความปลอดภัย (mock) ----------
+    const flags = [
+      { d: "วันนี้ 10:02", t: "ตัวกรองแชทพบหมอดูพยายามส่งเบอร์โทรในเซสชัน #4512", lv: "สูง", status: "" },
+      { d: "เมื่อวาน 18:30", t: "ลูกค้ารายงานคำแนะนำเชิงการเงินเกินขอบเขต เซสชัน #4488", lv: "กลาง", status: "" }
+    ];
+    function renderSafety() {
+      document.getElementById("safety-body").innerHTML = flags.map((f, i) => `
+        <tr>
+          <td style="white-space:nowrap">${f.d}</td>
+          <td>${f.t}</td>
+          <td><span class="badge ${f.lv === "สูง" ? "badge-danger" : ""}">${f.lv}</span></td>
+          <td style="white-space:nowrap">
+            ${f.status === "suspended" ? '<span class="badge badge-danger">ระงับชั่วคราวแล้ว — รอสอบสวน</span>'
+            : f.status === "warned" ? '<span class="badge badge-ok">✓ ตักเตือนแล้ว</span>'
+            : `<button class="btn btn-danger btn-sm" data-flag="${i}" data-do="suspended">ระงับชั่วคราว</button>
+               <button class="btn btn-ghost btn-sm" data-flag="${i}" data-do="warned">ตักเตือน</button>`}
+          </td>
+        </tr>`).join("");
+      document.querySelectorAll("[data-flag]").forEach(b => b.onclick = () => {
+        flags[+b.dataset.flag].status = b.dataset.do;
+        renderSafety();
+      });
+    }
+    renderSafety();
+  </script>
+</body>
+</html>

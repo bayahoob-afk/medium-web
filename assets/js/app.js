@@ -42,6 +42,7 @@
           <a href="join-seer.html">สมัครเป็นหมอดู</a>
           <a href="privacy.html">นโยบายความเป็นส่วนตัว</a>
           <a href="terms.html">เงื่อนไขการใช้งาน</a>
+          <a href="admin.html">หลังบ้านแพลตฟอร์ม (เดโม)</a>
         </div>
       </div>
       <div class="copyright">© 2026 Medium — แพลตฟอร์มหมอดูออนไลน์ · ทุกเซสชันมีคลิปและสรุปให้เสมอ</div>
