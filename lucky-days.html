@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>ปฏิทินฤกษ์ดี เช็คฤกษ์มงคล ฟรี — แต่งงาน เปิดกิจการ ออกรถ เลี่ยงวันชง | Medium</title>
+  <meta name="description" content="หาฤกษ์ดี 30 วันข้างหน้าฟรี — แต่งงาน เปิดกิจการ ออกรถ ขึ้นบ้านใหม่ เซ็นสัญญา คำนวณจากตำราวันประจำสัปดาห์และนักษัตรประจำวัน พร้อมเลี่ยงวันชงจากปีเกิดของคุณ บอกเหตุผลทุกข้อ">
+  <link rel="canonical" href="https://bayahoob-afk.github.io/medium-web/lucky-days.html">
+  <meta property="og:title" content="ปฏิทินฤกษ์ดี — หาวันมงคล 30 วันข้างหน้า ฟรี">
+  <meta property="og:description" content="เลือกกิจกรรม + ใส่วันเกิด ระบบหาวันดีให้พร้อมเหตุผล และเตือนวันชงที่ควรเลี่ยง">
+  <meta property="og:url" content="https://bayahoob-afk.github.io/medium-web/lucky-days.html">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔮</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#12081f">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-page="lucky">
+  <header class="nav" id="app-nav"></header>
+
+  <section class="section container">
+    <div class="section-head">
+      <h2>📅 ปฏิทิน<span class="em">ฤกษ์ดี</span> 30 วันข้างหน้า</h2>
+      <p>เลือกกิจกรรม + ใส่วันเกิด ระบบหาวันมงคลให้พร้อมบอกเหตุผลทุกข้อ
+        และเตือนวันชงตามปีนักษัตรของคุณ</p>
+    </div>
+
+    <div class="card" style="max-width:640px;margin:0 auto 24px">
+      <div class="form-group">
+        <label>จะทำอะไรดี?</label>
+        <div class="tool-pick-row" id="act-chips"></div>
+      </div>
+      <div class="form-group">
+        <label>วันเกิดของคุณ (ใช้หาวันชงที่ควรเลี่ยง)</label>
+        <input type="date" id="ld-dob" style="width:100%;background:rgba(0,0,0,.3);color:inherit;border:1px solid var(--line);border-radius:10px;padding:8px 12px;font:inherit">
+      </div>
+      <button class="btn btn-gold" style="width:100%" id="ld-go">🔮 เปิดปฏิทินฤกษ์ดี</button>
+      <p class="muted" style="font-size:.78rem;margin-top:12px">
+        โปร่งใส 100%: คำนวณในเครื่องของคุณจาก (1) ตำราวันมงคลประจำสัปดาห์แบบไทย และ
+        (2) นักษัตรประจำวันแบบจีน (วันชง/วันสมพงศ์กับปีเกิด) — เพื่อความบันเทิงและกำลังใจ
+        ฤกษ์ละเอียดรายบุคคล (ลัคนา/เวลาเกิด) ควรปรึกษาโหรตัวจริง</p>
+    </div>
+
+    <div id="ld-result" hidden>
+      <h3 class="tc" style="margin-bottom:6px">✨ ฤกษ์ดีสำหรับ "<span class="gold" id="ld-act-name"></span>"</h3>
+      <p class="tc muted" style="font-size:.85rem;margin-bottom:20px" id="ld-zodiac-line"></p>
+      <div class="grid grid-3" id="ld-top"></div>
+
+      <div class="card mt-3" style="border-color:rgba(248,113,113,.4)">
+        <h3>⚠️ วันชงของคุณใน 30 วันนี้ — งานมงคลควรเลี่ยง</h3>
+        <p class="muted" id="ld-chong" style="font-size:.9rem;margin-top:8px"></p>
+      </div>
+
+      <div class="tc mt-3" style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+        <button class="btn btn-purple btn-sm" id="ld-share">🖼️ แชร์ฤกษ์เป็นการ์ด</button>
+        <a class="btn btn-gold btn-sm" href="seers.html">🗓️ ให้โหรตัวจริงผูกฤกษ์ละเอียด</a>
+        <a class="btn btn-ghost btn-sm" href="medium.html#thai-astro">🕯️ ถามหมอดูทิพย์โหราไทย</a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer" id="app-footer"></footer>
+
+  <script src="assets/js/app.js"></script>
+  <script src="assets/js/daily.js"></script>
+  <script src="assets/js/sharecard.js"></script>
+  <script>
+    // ---------- ตำราวันมงคลประจำสัปดาห์ (0=อาทิตย์ ... 6=เสาร์) ----------
+    const ACTIVITIES = {
+      wedding: { label: "💍 แต่งงาน/หมั้น", good: [5, 4, 1], bad: [2, 6], why: "ตำรานิยมวันศุกร์ (เมตตามหานิยม) พฤหัส (ผู้ใหญ่เมตตา) จันทร์ (ร่มเย็น) · เลี่ยงอังคาร (แข็งกร้าว) เสาร์ (โทษทุกข์)" },
+      business: { label: "🏪 เปิดกิจการ/เปิดร้าน", good: [4, 5, 0], bad: [2], why: "ตำรานิยมพฤหัส (ความเจริญ) ศุกร์ (โภคทรัพย์) อาทิตย์ (อำนาจบารมี) · เลี่ยงอังคาร (ขัดแย้ง)" },
+      car: { label: "🚗 ออกรถ", good: [3, 5, 1], bad: [6, 2], why: "ตำรานิยมพุธ (คล่องตัว) ศุกร์ (โชคลาภ) จันทร์ (ราบรื่น) · เลี่ยงเสาร์ (อุปสรรค) อังคาร (ร้อนแรง)" },
+      house: { label: "🏠 ขึ้นบ้านใหม่", good: [4, 5, 1], bad: [6], why: "ตำรานิยมพฤหัส (มั่นคง) ศุกร์ (อยู่เย็น) จันทร์ (ร่มเย็น) · เลี่ยงเสาร์ (โทษทุกข์)" },
+      contract: { label: "📝 เซ็นสัญญา/ตกลงธุรกิจ", good: [3, 4], bad: [2], why: "ตำรานิยมพุธ (เจรจาสำเร็จ) พฤหัส (ผู้ใหญ่หนุน) · เลี่ยงอังคาร (พิพาท)" },
+      job: { label: "💼 เริ่มงานใหม่", good: [1, 4], bad: [2, 6], why: "ตำรานิยมจันทร์ (เริ่มต้นนุ่มนวล) พฤหัส (เจ้านายเมตตา) · เลี่ยงอังคาร เสาร์" }
+    };
+    const DAY_TH = ["อาทิตย์", "จันทร์", "อังคาร", "พุธ", "พฤหัสบดี", "ศุกร์", "เสาร์"];
+    const ZODIAC = ["ชวด (หนู)", "ฉลู (วัว)", "ขาล (เสือ)", "เถาะ (กระต่าย)", "มะโรง (มังกร)", "มะเส็ง (งู)", "มะเมีย (ม้า)", "มะแม (แพะ)", "วอก (ลิง)", "ระกา (ไก่)", "จอ (สุนัข)", "กุน (หมู)"];
+    const SOULMATE = { 0: 1, 1: 0, 2: 11, 11: 2, 3: 10, 10: 3, 4: 9, 9: 4, 5: 8, 8: 5, 6: 7, 7: 6 };
+
+    // นักษัตรประจำวันแบบจีน: กิ่งดิน (Earthly Branch) ของวัน = (JDN + 1) mod 12 โดย 0 = ชวด
+    // ตรวจสอบกับวันอ้างอิง 1 ม.ค. 2000 = วันมะเมีย (午)
+    function dayZodiac(date) {
+      const jdn = Math.floor(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) / 86400000) + 2440588;
+      return ((jdn + 1) % 12 + 12) % 12;
+    }
+    function yearZodiac(dob) { const y = +dob.slice(0, 4); return ((y - 4) % 12 + 12) % 12; }
+
+    // ---------- UI ----------
+    let activeAct = "business";
+    const chips = document.getElementById("act-chips");
+    chips.innerHTML = Object.entries(ACTIVITIES).map(([k, a]) =>
+      `<button class="chip tool-pick ${k === activeAct ? "active" : ""}" data-act="${k}">${a.label}</button>`).join("");
+    chips.querySelectorAll("[data-act]").forEach(b => b.onclick = () => {
+      activeAct = b.dataset.act;
+      chips.querySelectorAll(".chip").forEach(x => x.classList.toggle("active", x === b));
+    });
+
+    const dobEl = document.getElementById("ld-dob");
+    const profile = window.MEDIUM_DAILY.getProfile();
+    if (profile && profile.dob) dobEl.value = profile.dob;
+
+    let topDays = [];
+
+    document.getElementById("ld-go").onclick = () => {
+      if (!dobEl.value) { dobEl.style.outline = "1px solid var(--danger)"; return; }
+      dobEl.style.outline = "";
+      const act = ACTIVITIES[activeAct];
+      const myZ = yearZodiac(dobEl.value);
+      const chongZ = (myZ + 6) % 12;
+      const days = [];
+      const chongDays = [];
+      for (let i = 1; i <= 30; i++) {
+        const d = new Date(); d.setDate(d.getDate() + i);
+        const wd = d.getDay(), dz = dayZodiac(d);
+        const reasons = [];
+        let score = 0;
+        if (act.good.includes(wd)) { score += 2; reasons.push(`วัน${DAY_TH[wd]}เป็นวันมงคลของงานนี้ตามตำรา`); }
+        if (act.bad.includes(wd)) { score -= 2; reasons.push(`วัน${DAY_TH[wd]}ตำราให้เลี่ยงสำหรับงานนี้`); }
+        if (dz === chongZ) { chongDays.push(d); continue; } // วันชง — ตัดออกจากฤกษ์ดีเสมอ
+        if (dz === SOULMATE[myZ]) { score += 2; reasons.push(`นักษัตรประจำวัน (${ZODIAC[dz]}) เป็นคู่สมพงศ์กับปีเกิดคุณ`); }
+        else if (dz === myZ) { score += 1; reasons.push(`ตรงนักษัตรปีเกิดคุณ (${ZODIAC[dz]}) — วันแห่งพลังของตัวเอง`); }
+        else if (dz % 4 === myZ % 4) { score += 1; reasons.push(`นักษัตรประจำวันอยู่กลุ่มตรีมิตรกับปีเกิดคุณ`); }
+        days.push({ d, wd, dz, score, reasons });
+      }
+      days.sort((a, b) => b.score - a.score || a.d - b.d);
+      topDays = days.slice(0, 5);
+
+      const fmt = d => d.toLocaleDateString("th-TH", { weekday: "long", day: "numeric", month: "long" });
+      document.getElementById("ld-act-name").textContent = act.label;
+      document.getElementById("ld-zodiac-line").textContent =
+        `ปีเกิดคุณ: ${ZODIAC[myZ]} · วันชงของคุณคือวันที่นักษัตรประจำวันเป็น ${ZODIAC[chongZ]} · ${act.why}`;
+      document.getElementById("ld-top").innerHTML = topDays.map((x, i) => `
+        <div class="card ${i === 0 ? "" : ""}" style="${i === 0 ? "border-color:var(--gold)" : ""}">
+          <div style="font-size:.78rem;color:var(--text-faint)">${i === 0 ? "🥇 ฤกษ์ดีที่สุด" : "อันดับ " + (i + 1)}</div>
+          <h3 style="margin:4px 0">${fmt(x.d)}</h3>
+          <div class="gold" style="font-size:.9rem">${"★".repeat(Math.max(1, Math.min(5, x.score + 2)))} · นักษัตรประจำวัน: ${ZODIAC[x.dz]}</div>
+          <ul class="muted" style="font-size:.8rem;padding-left:18px;margin:8px 0">
+            ${x.reasons.length ? x.reasons.map(r => `<li>${r}</li>`).join("") : "<li>วันกลาง ๆ ไม่มีข้อห้ามตามตำรา</li>"}
+          </ul>
+          <button class="btn btn-ghost btn-sm" data-ics="${x.d.toISOString().split("T")[0]}">📅 บันทึกลงปฏิทิน</button>
+        </div>`).join("");
+      document.getElementById("ld-chong").innerHTML = chongDays.length
+        ? chongDays.map(fmt).join(" · ") + `<br><span style="font-size:.78rem">วันเหล่านี้นักษัตรประจำวันเป็น ${ZODIAC[chongZ]} ซึ่งชงกับปีเกิดคุณตามตำราจีน — ไม่ได้แปลว่าห้ามใช้ชีวิต แค่งานมงคลใหญ่ควรเลือกวันอื่น`
+        : "ไม่มีวันชงของคุณใน 30 วันนี้ 🎉";
+      document.getElementById("ld-result").hidden = false;
+      document.getElementById("ld-result").scrollIntoView({ behavior: "smooth" });
+
+      document.querySelectorAll("[data-ics]").forEach(b => b.onclick = () => {
+        const date = b.dataset.ics;
+        const fmtI = s => s.replace(/-/g, "");
+        const ics = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Medium//TH", "BEGIN:VEVENT",
+          "UID:" + Date.now() + "@medium", "DTSTART;VALUE=DATE:" + fmtI(date),
+          "SUMMARY:✨ ฤกษ์ดี — " + act.label.replace(/[\n,;]/g, " "),
+          "DESCRIPTION:ฤกษ์ดีจากปฏิทิน Medium (ตำราวันประจำสัปดาห์ + นักษัตรประจำวัน)",
+          "END:VEVENT", "END:VCALENDAR"].join("\r\n");
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(new Blob([ics], { type: "text/calendar" }));
+        a.download = "medium-lucky-day.ics";
+        document.body.appendChild(a); a.click(); a.remove();
+      });
+    };
+
+    document.getElementById("ld-share").onclick = () => {
+      if (!topDays.length) return;
+      const act = ACTIVITIES[activeAct];
+      const fmt = d => d.toLocaleDateString("th-TH", { weekday: "long", day: "numeric", month: "long" });
+      const canvas = MEDIUM_CARD.drawReadingCard({
+        source: "ปฏิทินฤกษ์ดี",
+        text: `${act.label}\n\n🥇 ${fmt(topDays[0].d)}\n${topDays[0].reasons[0] || ""}\n\n` +
+          topDays.slice(1, 3).map((x, i) => `${i + 2}. ${fmt(x.d)}`).join("\n")
+      });
+      MEDIUM_CARD.share(canvas, "medium-lucky-day.png", "📅 ฤกษ์ดีของฉันจาก Medium — เช็คของคุณฟรี");
+    };
+  </script>
+</body>
+</html>

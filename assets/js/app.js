@@ -11,6 +11,7 @@
         <a href="medium.html" ${page === "medium" ? 'class="active"' : ""}>หมอดูทิพย์</a>
         <a href="wallpaper.html" ${page === "wallpaper" ? 'class="active"' : ""}>วอลเปเปอร์มงคล</a>
         <a href="match.html" ${page === "match" ? 'class="active"' : ""}>ดวงคู่</a>
+        <a href="lucky-days.html" ${page === "lucky" ? 'class="active"' : ""}>ฤกษ์ดี</a>
         <a href="my-bookings.html" ${page === "bookings" ? 'class="active"' : ""}>การจองของฉัน</a>
         <a href="session.html" ${page === "session" ? 'class="active"' : ""}>เดโมเซสชัน</a>
         <a href="dashboard.html" ${page === "dashboard" ? 'class="active"' : ""}>หลังบ้านหมอดู</a>
