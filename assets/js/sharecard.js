@@ -419,6 +419,29 @@ window.MEDIUM_CARD = (function () {
     }
   };
 
+  // เส้นคั่นตกแต่ง: — ◆ — สไตล์ editorial
+  function divider(ctx, W, y, color) {
+    ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(W / 2 - 290, y); ctx.lineTo(W / 2 - 45, y); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(W / 2 + 45, y); ctx.lineTo(W / 2 + 290, y); ctx.stroke();
+    ctx.save(); ctx.translate(W / 2, y); ctx.rotate(Math.PI / 4);
+    ctx.fillRect(-8, -8, 16, 16); ctx.restore();
+    ctx.beginPath(); ctx.arc(W / 2 - 310, y, 4, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(W / 2 + 310, y, 4, 0, Math.PI * 2); ctx.fill();
+  }
+
+  // ป้ายชิปโค้งแบบ UI บนเว็บ Medium — สีตามด้านที่เสริม
+  function goalChip(ctx, W, y, text, color, textColor) {
+    ctx.font = "600 40px " + FONT;
+    const tw = ctx.measureText(text).width, pw = tw + 90, ph = 76;
+    ctx.fillStyle = color + "1f";
+    roundRect(ctx, W / 2 - pw / 2, y - 52, pw, ph, 38); ctx.fill();
+    ctx.strokeStyle = color; ctx.lineWidth = 2.5;
+    roundRect(ctx, W / 2 - pw / 2, y - 52, pw, ph, 38); ctx.stroke();
+    ctx.fillStyle = textColor;
+    ctx.fillText(text, W / 2, y);
+  }
+
   // ---------- วอลเปเปอร์เสริมดวง 1080×2340 (จอมือถือ) ----------
   function drawWallpaper(opts) {
     const W = 1080, H = 2340;
@@ -442,10 +465,17 @@ window.MEDIUM_CARD = (function () {
     c.width = W; c.height = H;
     const ctx = c.getContext("2d");
 
+    // ธีม "Mystic Medium": พื้นหลังม่วงราตรีเดียวกันทุกภาพ = คอลเลกชันแบรนด์เดียวกัน
+    // สีประจำด้าน (การเงิน/รัก/โชค/งาน) ใช้เป็นแสงเรืองกลางภาพ + ป้ายชิปเท่านั้น
     const bg = ctx.createLinearGradient(0, 0, 0, H);
-    if (pastel) { bg.addColorStop(0, goal.p1); bg.addColorStop(0.6, goal.p2); bg.addColorStop(1, "#efdcc0"); }
-    else { bg.addColorStop(0, goal.g1); bg.addColorStop(0.55, goal.g2); bg.addColorStop(1, "#0b0618"); }
+    if (pastel) { bg.addColorStop(0, "#f8f3ff"); bg.addColorStop(0.55, "#f1e7de"); bg.addColorStop(1, "#eadcc4"); }
+    else { bg.addColorStop(0, "#2a1747"); bg.addColorStop(0.55, "#150b2b"); bg.addColorStop(1, "#0b0618"); }
     ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+    // แสงเรืองสีประจำด้าน กลางส่วนบนของภาพ
+    const hueGlow = ctx.createRadialGradient(W / 2, 720, 80, W / 2, 720, 900);
+    hueGlow.addColorStop(0, goal.accent + (pastel ? "20" : "2c"));
+    hueGlow.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = hueGlow; ctx.fillRect(0, 0, W, H);
     // ลายเซ็นแบรนด์ Medium: แสงม่วง-ชมพูแบบเดียวกับพื้นหลังเว็บ (Mystic Modern)
     const sig1 = ctx.createRadialGradient(W * 0.82, H * 0.08, 0, W * 0.82, H * 0.08, 700);
     sig1.addColorStop(0, pastel ? "rgba(139,92,246,.12)" : "rgba(139,92,246,.22)");
@@ -502,18 +532,19 @@ window.MEDIUM_CARD = (function () {
 
     if (styleKey === "tarot") {
       // สไตล์ยอดนิยม: คำอังกฤษ serif ทองฟอยล์ + ไพ่ 3 ใบซ้อน + เลข 3 หลัก
-      goldText(ctx, GOAL_EN[goalKey], W / 2, 345, 168, 700, true, 16);
-      ctx.fillStyle = tMain; ctx.font = "600 46px " + FONT;
-      ctx.fillText(goal.label, W / 2, 435);
+      goldText(ctx, GOAL_EN[goalKey], W / 2, 340, 168, 700, true, 16);
+      goalChip(ctx, W, 448, goal.label, ac, tMain);
       const cards = GOAL_CARDS[goalKey];
-      miniCard(ctx, W / 2 - 265, 850, -0.16, cards[0]);
-      miniCard(ctx, W / 2 + 265, 850, 0.16, cards[2]);
-      miniCard(ctx, W / 2, 805, 0, cards[1]);
-      goldText(ctx, String(luckyNum3), W / 2, 1450, 240, 700, true, 10);
+      miniCard(ctx, W / 2 - 265, 870, -0.16, cards[0]);
+      miniCard(ctx, W / 2 + 265, 870, 0.16, cards[2]);
+      miniCard(ctx, W / 2, 825, 0, cards[1]);
+      divider(ctx, W, 1180, ac + "aa");
+      goldText(ctx, String(luckyNum3), W / 2, 1455, 235, 700, true, 10);
       ctx.fillStyle = ac; ctx.font = "600 38px " + FONT;
-      ctx.fillText("เลขนำโชคประจำดวงคุณ", W / 2, 1530);
+      ctx.fillText("เลขนำโชคประจำดวงคุณ", W / 2, 1535);
       ctx.fillStyle = tMain; ctx.font = "500 38px " + FONT;
-      wrap(ctx, goal.bless, W - 240).forEach((l, i) => ctx.fillText(l, W / 2, 1610 + i * 56));
+      wrap(ctx, goal.bless, W - 240).forEach((l, i) => ctx.fillText(l, W / 2, 1615 + i * 56));
+      divider(ctx, W, 1720, ac + "66");
     } else if (styleKey === "deity") {
       // คอลเลกชันเทพมงคล: รัศมี + สัญลักษณ์ + ไพ่ประจำองค์ขนาบ + ชื่อเทพอักษรทอง
       const d = GOAL_DEITY[goalKey], cy = 540;
@@ -551,22 +582,23 @@ window.MEDIUM_CARD = (function () {
       ctx.fillStyle = tMain; ctx.font = "500 42px " + FONT;
       wrap(ctx, d.wish, W - 240).forEach((l, i) => ctx.fillText(l, W / 2, 1140 + i * 62));
       ctx.fillStyle = tSub; ctx.font = "32px " + FONT;
-      ctx.fillText("ไพ่ประจำองค์: " + d.cards.map(c => c.n).join(" · "), W / 2, 1300);
-      goldText(ctx, String(luckyNum3), W / 2, 1520, 210, 700, true, 10);
+      ctx.fillText("ไพ่ประจำองค์: " + d.cards.map(c => c.n).join(" · "), W / 2, 1290);
+      divider(ctx, W, 1360, ac + "aa");
+      goldText(ctx, String(luckyNum3), W / 2, 1560, 210, 700, true, 10);
       ctx.fillStyle = ac; ctx.font = "600 38px " + FONT;
-      ctx.fillText("เลขนำโชคประจำดวงคุณ · " + goal.label, W / 2, 1600);
+      ctx.fillText("เลขนำโชคประจำดวงคุณ", W / 2, 1640);
+      goalChip(ctx, W, 1712, goal.label, ac, tMain);
     } else {
       // ลายคลาสสิก: ลวดลายตอนบน + เลขหลักเดียวในวงแหวน
-      MOTIFS[styleKey](ctx, W, ac, seed, pastel ? goal.p1 : goal.g1);
+      MOTIFS[styleKey](ctx, W, ac, seed, pastel ? "#f1e7de" : "#150b2b");
       ctx.fillStyle = tMain;
       ctx.font = "150px " + FONT;
       ctx.fillText(goal.emoji, W / 2, 860);
-      ctx.fillStyle = ac;
-      ctx.font = "700 58px " + FONT;
-      ctx.fillText(goal.label, W / 2, 990);
+      goalChip(ctx, W, 985, goal.label, ac, tMain);
       ctx.fillStyle = tMain;
       ctx.font = "500 40px " + FONT;
-      wrap(ctx, goal.bless, W - 220).forEach((l, i) => ctx.fillText(l, W / 2, 1070 + i * 60));
+      wrap(ctx, goal.bless, W - 220).forEach((l, i) => ctx.fillText(l, W / 2, 1090 + i * 60));
+      divider(ctx, W, 1225, ac + "88");
 
       ctx.strokeStyle = ac; ctx.lineWidth = 6;
       ctx.beginPath(); ctx.arc(W / 2, 1440, 150, 0, Math.PI * 2); ctx.stroke();
