@@ -203,11 +203,10 @@
 
     function renderSummary() {
       const price = currentPkg * currentSeer.pricePerMin;
-      const fee = Math.round(price * 0.2);
       document.getElementById("bk-summary").innerHTML = `
         <div class="row"><span>แพ็กเกจ ${currentPkg} นาที</span><span>฿${price.toLocaleString()}</span></div>
-        <div class="row"><span>รวมค่าบริการแพลตฟอร์มแล้ว (20% หักจากหมอดู)</span><span>—</span></div>
         <div class="row"><span>🎥 อัดคลิป + 📋 สรุปคำทำนาย</span><span class="gold">ฟรี</span></div>
+        <div class="row"><span>ราคารวมทุกอย่างแล้ว ไม่มีค่าใช้จ่ายเพิ่ม</span><span>✓</span></div>
         <div class="row total"><span>ยอดชำระ</span><b>฿${price.toLocaleString()}</b></div>`;
     }
 

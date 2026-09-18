@@ -461,25 +461,104 @@ button { font-family: inherit; cursor: pointer; }
   border-radius: 10px; padding: 10px 14px; font: inherit;
 }
 .card-fan {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(74px, 1fr));
-  gap: 10px; margin: 14px 0 8px;
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+  gap: 12px; margin: 16px 0 10px;
+  perspective: 1000px;
 }
 .tcard {
   aspect-ratio: 2 / 3;
-  border-radius: 10px;
-  border: 1px solid var(--purple, #8b5cf6);
-  background: linear-gradient(145deg, #2a1548, #12081f);
-  color: var(--gold, #e6b84c);
-  font-size: 1.6rem;
+  background: transparent; border: 0; padding: 0;
   cursor: pointer;
-  transition: transform .25s, box-shadow .25s;
+  transition: transform .25s;
+  animation: tcard-deal .5s backwards;
+  animation-delay: calc(var(--i, 0) * 50ms);
 }
-.tcard:hover:not(.flip) { transform: translateY(-6px); box-shadow: 0 8px 18px rgba(139,92,246,.35); }
-.tcard.flip {
-  background: linear-gradient(145deg, #3b2a12, #1f1408);
+@keyframes tcard-deal {
+  from { opacity: 0; transform: translateY(16px) scale(.88); }
+  to { opacity: 1; transform: none; }
+}
+.tcard:hover:not(.flip) { transform: translateY(-8px) rotate(-1.5deg); }
+.tcard.flip { cursor: default; }
+.tcard-inner {
+  position: relative; display: block; width: 100%; height: 100%;
+  transform-style: preserve-3d;
+  transition: transform .65s cubic-bezier(.3, .8, .3, 1.05);
+}
+.tcard.flip .tcard-inner { transform: rotateY(180deg); }
+.tcard-face {
+  position: absolute; inset: 0;
+  backface-visibility: hidden; -webkit-backface-visibility: hidden;
+  border-radius: 12px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  overflow: hidden;
+}
+/* หลังไพ่ (ก่อนเปิด): ม่วงราตรี + กรอบทองซ้อน + ตราจันทร์-ดาว */
+.tc-cover {
+  gap: 2px;
+  background:
+    radial-gradient(circle at 50% 16%, rgba(230,184,76,.20), transparent 45%),
+    radial-gradient(circle at 50% 88%, rgba(139,92,246,.30), transparent 55%),
+    linear-gradient(160deg, #2e1656, #180b30 55%, #0c0518);
+  border: 1px solid rgba(230,184,76,.55);
+  box-shadow: 0 4px 14px rgba(0,0,0,.45);
+  animation: tc-glow 3s ease-in-out infinite;
+  animation-delay: calc(var(--i, 0) * 240ms);
+}
+.tc-cover::before {
+  content: ""; position: absolute; inset: 5px;
+  border: 1px solid rgba(230,184,76,.4); border-radius: 8px;
+  pointer-events: none;
+}
+.tc-cover::after {
+  content: "✧ ✦ ✧"; position: absolute; bottom: 10px;
+  font-size: .5rem; color: rgba(230,184,76,.65); letter-spacing: 2px;
+}
+@keyframes tc-glow {
+  0%, 100% { box-shadow: 0 4px 14px rgba(0,0,0,.45); }
+  50% { box-shadow: 0 4px 18px rgba(0,0,0,.45), 0 0 16px rgba(230,184,76,.30); }
+}
+.tcard:hover:not(.flip) .tc-cover {
+  animation: none;
+  box-shadow: 0 10px 22px rgba(0,0,0,.5), 0 0 22px rgba(230,184,76,.45);
   border-color: var(--gold, #e6b84c);
-  font-size: .72rem; font-weight: 600; cursor: default;
-  padding: 4px; word-break: break-word;
+}
+.tc-moon {
+  font-size: 1.7rem; line-height: 1;
+  color: var(--gold, #e6b84c);
+  text-shadow: 0 0 12px rgba(230,184,76,.7);
+}
+.tc-orn { font-size: .6rem; color: rgba(196,164,255,.85); letter-spacing: 1px; }
+/* หน้าไพ่ (หลังเปิด): พื้นทองเข้ม + เลข + สัญลักษณ์ + ชื่อ */
+.tc-reveal {
+  transform: rotateY(180deg);
+  gap: 3px; padding: 6px 4px;
+  background:
+    radial-gradient(circle at 50% 30%, rgba(230,184,76,.16), transparent 60%),
+    linear-gradient(165deg, #43300f, #241605 60%, #120a02);
+  border: 1px solid var(--gold, #e6b84c);
+  box-shadow: 0 4px 16px rgba(0,0,0,.5), 0 0 18px rgba(230,184,76,.25);
+}
+.tc-reveal::before {
+  content: ""; position: absolute; inset: 5px;
+  border: 1px solid rgba(230,184,76,.35); border-radius: 8px;
+  pointer-events: none;
+}
+.tr-num {
+  font-size: .58rem; font-weight: 700; letter-spacing: 2px;
+  color: rgba(230,184,76,.85);
+}
+.tr-emoji {
+  font-size: 1.55rem; line-height: 1.2;
+  filter: drop-shadow(0 0 8px rgba(230,184,76,.55));
+}
+.tr-name {
+  font-size: .58rem; font-weight: 600; line-height: 1.15;
+  color: #f3dfae; text-align: center; word-break: break-word;
+}
+.tr-pos {
+  font-size: .5rem; padding: 1px 6px; border-radius: 99px;
+  background: rgba(139,92,246,.3); border: 1px solid rgba(139,92,246,.55);
+  color: #d9c8ff; white-space: nowrap;
 }
 
 /* ---------- สมุดคำทำนาย ---------- */
