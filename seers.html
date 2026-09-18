@@ -119,6 +119,7 @@
           </div>
           <div class="rating">${starText(s.rating)} ${s.rating} <span class="cnt">(${s.reviews.toLocaleString()} รีวิว)</span></div>
           <p class="muted" style="font-size:.88rem">${s.bio}</p>
+          <p class="muted" style="font-size:.78rem">🧰 ${seerTools(s).join(" · ")}</p>
           <div class="seer-foot">
             <div class="price"><b>฿${s.pricePerMin}</b> <span>/นาที</span></div>
             <button class="btn btn-gold btn-sm" onclick="openBooking('${s.id}')">จองคิว</button>
@@ -154,11 +155,23 @@
     document.getElementById("modal-close").onclick = () => modal.hidden = true;
     modal.addEventListener("click", e => { if (e.target === modal) modal.hidden = true; });
 
-    let currentSeer = null, currentPkg = 30;
+    let currentSeer = null, currentPkg = 30, currentTool = "", currentFiles = [];
+
+    // เครื่องมือของหมอดู: ถ้าหมอดูปรับไว้จากหลังบ้าน (localStorage) ให้ใช้ค่านั้นก่อน
+    function seerTools(s) {
+      try {
+        const o = JSON.parse(localStorage.getItem("medium_seer_tools_" + s.id));
+        if (Array.isArray(o) && o.length) return o;
+      } catch (e) { /* ใช้ค่าเริ่มต้น */ }
+      return s.tools || [];
+    }
 
     function openBooking(id) {
       currentSeer = window.SEERS.find(s => s.id === id);
       currentPkg = 30;
+      currentFiles = [];
+      const tools = seerTools(currentSeer);
+      currentTool = tools[0] || currentSeer.craft;
       const today = new Date().toISOString().split("T")[0];
       body.innerHTML = `
         <h3>จองคิว — ${currentSeer.name}</h3>
@@ -172,6 +185,13 @@
               </button>`).join("")}
           </div>
         </div>
+        ${tools.length ? `
+        <div class="form-group">
+          <label>เลือกวิธีพยากรณ์ (เครื่องมือที่หมอดูท่านนี้ใช้)</label>
+          <div class="tool-pick-row" id="tool-pick-row">
+            ${tools.map((t, i) => `<button class="chip tool-pick ${i === 0 ? "active" : ""}" data-tool="${t}">${t}</button>`).join("")}
+          </div>
+        </div>` : ""}
         <div class="form-group">
           <label>วันที่</label>
           <input type="date" id="bk-date" min="${today}" value="${today}">
@@ -186,25 +206,109 @@
           <label>เรื่องที่อยากถาม (ช่วยให้หมอดูเตรียมตัว)</label>
           <textarea id="bk-topic" rows="2" placeholder="เช่น ความรัก การงาน ดวงปีนี้..."></textarea>
         </div>
+        <div class="form-group">
+          <label>📎 แนบไฟล์/รูปประกอบ (ไม่บังคับ) — ส่งถึงหมอดูก่อนเริ่มเซสชัน</label>
+          <p class="muted" style="font-size:.78rem;margin:2px 0 8px">
+            ${currentSeer.attachHint || "เช่น รูปหรือเอกสารที่อยากให้หมอดูดูล่วงหน้า"}</p>
+          <input type="file" id="bk-files" multiple accept="image/*,.pdf"
+            style="width:100%;background:rgba(0,0,0,.3);color:inherit;border:1px dashed var(--line);border-radius:10px;padding:10px;font:inherit;font-size:.85rem">
+          <ul id="bk-file-list" class="muted" style="font-size:.8rem;margin:6px 0 0;padding-left:18px"></ul>
+        </div>
         <div class="summary-box" id="bk-summary"></div>
         <button class="btn btn-gold" style="width:100%" id="bk-confirm">💳 ชำระเงินและยืนยันการจอง</button>
         <p class="muted tc" style="font-size:.78rem;margin-top:10px">
-          เงินจะพักไว้ในระบบ (escrow) และโอนให้หมอดูหลังจบเซสชันเท่านั้น · ยกเลิกก่อน 24 ชม. คืนเงินเต็มจำนวน
+          เงินจะพักไว้ในระบบ (escrow) และโอนให้หมอดูหลังจบเซสชันเท่านั้น · ยกเลิกก่อน 24 ชม. คืนเงินเต็มจำนวน<br>
+          ไฟล์แนบเปิดดูได้เฉพาะหมอดูที่คุณจอง และถูกลบหลังจบเซสชัน 7 วัน (เดโมนี้ไฟล์ยังอยู่ในเครื่องคุณเท่านั้น)
         </p>`;
       body.querySelectorAll(".pkg").forEach(p => p.onclick = () => {
         currentPkg = +p.dataset.min;
         body.querySelectorAll(".pkg").forEach(x => x.classList.toggle("active", x === p));
         renderSummary();
       });
+      body.querySelectorAll(".tool-pick").forEach(t => t.onclick = () => {
+        currentTool = t.dataset.tool;
+        body.querySelectorAll(".tool-pick").forEach(x => x.classList.toggle("active", x === t));
+        renderSummary();
+      });
+      body.querySelector("#bk-files").onchange = e => {
+        currentFiles = [...e.target.files].map(f => ({ name: f.name, size: f.size }));
+        body.querySelector("#bk-file-list").innerHTML = currentFiles.map(f =>
+          `<li>${escapeHtml(f.name)} <span style="opacity:.6">(${(f.size / 1024).toFixed(0)} KB)</span></li>`).join("");
+        renderSummary();
+      };
       renderSummary();
-      body.querySelector("#bk-confirm").onclick = confirmBooking;
+      body.querySelector("#bk-confirm").onclick = showPayment;
       modal.hidden = false;
+    }
+
+    // ---------- ขั้นตอนชำระเงิน (เดโม — ระบบจริงต่อ Payment Gateway) ----------
+    const PAY_METHODS = [
+      { id: "promptpay", label: "📱 พร้อมเพย์ (QR)" },
+      { id: "card", label: "💳 บัตรเครดิต/เดบิต" },
+      { id: "wallet", label: "👛 TrueMoney Wallet" }
+    ];
+    function showPayment() {
+      const date = body.querySelector("#bk-date").value;
+      const time = body.querySelector("#bk-time").value;
+      const topic = body.querySelector("#bk-topic").value.trim() || "ดวงโดยรวม";
+      const price = currentPkg * currentSeer.pricePerMin;
+      let method = "promptpay";
+      body.innerHTML = `
+        <h3>💳 ชำระเงิน ฿${price.toLocaleString()}</h3>
+        <p class="muted" style="font-size:.85rem">
+          ${currentSeer.name} · ${date} เวลา ${time} น. (${currentPkg} นาที) · ${currentTool}</p>
+        <div class="form-group">
+          <label>เลือกวิธีชำระเงิน</label>
+          <div class="pay-methods">
+            ${PAY_METHODS.map((m, i) => `
+              <button class="pay-m ${i === 0 ? "active" : ""}" data-m="${m.id}">${m.label}</button>`).join("")}
+          </div>
+        </div>
+        <div id="pay-detail"></div>
+        <button class="btn btn-gold" style="width:100%" id="pay-confirm">✅ ฉันชำระเงินแล้ว (เดโม)</button>
+        <button class="btn btn-ghost btn-sm" style="width:100%;margin-top:8px" id="pay-back">← กลับไปแก้ไขการจอง</button>
+        <p class="muted tc" style="font-size:.78rem;margin-top:10px">
+          โหมดเดโม — ยังไม่ตัดเงินจริง อย่ากรอกข้อมูลบัตรจริง<br>
+          ระบบจริง: เงินพักใน escrow และโอนให้หมอดูหลังจบเซสชัน + ส่งสรุปแล้วเท่านั้น</p>`;
+      const detail = body.querySelector("#pay-detail");
+      function renderDetail() {
+        detail.innerHTML = method === "promptpay" ? `
+          <div class="qr-box">
+            <div class="qr-mock" aria-hidden="true"></div>
+            <p>สแกนด้วยแอปธนาคารใดก็ได้<br>
+              <b class="gold">฿${price.toLocaleString()}</b> · Medium Platform<br>
+              <span class="muted" style="font-size:.75rem">QR ตัวอย่างสำหรับเดโมเท่านั้น</span></p>
+          </div>`
+        : method === "card" ? `
+          <div class="form-group"><label>หมายเลขบัตร (เดโม — ไม่ต้องกรอก)</label>
+            <input disabled placeholder="•••• •••• •••• ••••" class="pay-input"></div>
+          <div style="display:flex;gap:10px">
+            <div class="form-group" style="flex:1"><label>หมดอายุ</label><input disabled placeholder="MM/YY" class="pay-input"></div>
+            <div class="form-group" style="flex:1"><label>CVV</label><input disabled placeholder="•••" class="pay-input"></div>
+          </div>`
+        : `
+          <div class="form-group"><label>เบอร์ TrueMoney (เดโม — ไม่ต้องกรอก)</label>
+            <input disabled placeholder="08x-xxx-xxxx" class="pay-input"></div>`;
+      }
+      renderDetail();
+      body.querySelectorAll(".pay-m").forEach(b => b.onclick = () => {
+        method = b.dataset.m;
+        body.querySelectorAll(".pay-m").forEach(x => x.classList.toggle("active", x === b));
+        renderDetail();
+      });
+      body.querySelector("#pay-back").onclick = () => openBooking(currentSeer.id);
+      body.querySelector("#pay-confirm").onclick = () => {
+        const label = PAY_METHODS.find(m => m.id === method).label;
+        confirmBooking(date, time, topic, label);
+      };
     }
 
     function renderSummary() {
       const price = currentPkg * currentSeer.pricePerMin;
       document.getElementById("bk-summary").innerHTML = `
         <div class="row"><span>แพ็กเกจ ${currentPkg} นาที</span><span>฿${price.toLocaleString()}</span></div>
+        <div class="row"><span>วิธีพยากรณ์</span><span>${currentTool}</span></div>
+        ${currentFiles.length ? `<div class="row"><span>📎 ไฟล์แนบถึงหมอดู</span><span>${currentFiles.length} ไฟล์</span></div>` : ""}
         <div class="row"><span>🎥 อัดคลิป + 📋 สรุปคำทำนาย</span><span class="gold">ฟรี</span></div>
         <div class="row"><span>ราคารวมทุกอย่างแล้ว ไม่มีค่าใช้จ่ายเพิ่ม</span><span>✓</span></div>
         <div class="row total"><span>ยอดชำระ</span><b>฿${price.toLocaleString()}</b></div>`;
@@ -220,7 +324,7 @@
       const ics = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Medium//TH", "BEGIN:VEVENT",
         "UID:" + Date.now() + "@medium", "DTSTART:" + fmt(start), "DTEND:" + fmt(end),
         "SUMMARY:🔮 นัดดูดวงกับ" + currentSeer.name,
-        "DESCRIPTION:เรื่องที่ถาม: " + topic.replace(/[\n,;]/g, " ") + " · เข้าเซสชันที่ " + location.origin + location.pathname.replace(/[^/]*$/, "") + "session.html",
+        "DESCRIPTION:วิธีพยากรณ์: " + currentTool.replace(/[\n,;]/g, " ") + " · เรื่องที่ถาม: " + topic.replace(/[\n,;]/g, " ") + " · เข้าเซสชันที่ " + location.origin + location.pathname.replace(/[^/]*$/, "") + "session.html",
         "BEGIN:VALARM", "TRIGGER:-PT30M", "ACTION:DISPLAY", "DESCRIPTION:อีก 30 นาทีถึงนัดดูดวง", "END:VALARM",
         "END:VEVENT", "END:VCALENDAR"].join("\r\n");
       const a = document.createElement("a");
@@ -229,16 +333,14 @@
       document.body.appendChild(a); a.click(); a.remove();
     }
 
-    function confirmBooking() {
-      const date = body.querySelector("#bk-date").value;
-      const time = body.querySelector("#bk-time").value;
-      const topic = body.querySelector("#bk-topic").value.trim() || "ดวงโดยรวม";
+    function confirmBooking(date, time, topic, payLabel) {
       // เก็บข้อมูลการจองไว้ให้หน้าเซสชันใช้ (จำลอง backend)
       try {
         sessionStorage.setItem("mediumBooking", JSON.stringify({
           seerId: currentSeer.id, seerName: currentSeer.name, seerEmoji: currentSeer.emoji,
           craft: currentSeer.craft, minutes: currentPkg,
-          price: currentPkg * currentSeer.pricePerMin, date, time, topic
+          price: currentPkg * currentSeer.pricePerMin, date, time, topic,
+          tool: currentTool, files: currentFiles.map(f => f.name)
         }));
       } catch (e) { /* private mode: ไปต่อได้ หน้าเซสชันมีค่า default */ }
       // ประวัติการจองข้าม session (สำหรับ badge "เคยจอง" และการจองซ้ำ)
@@ -250,8 +352,10 @@
           <h3 class="mt-1">จองคิวสำเร็จ!</h3>
           <p class="muted" style="margin:10px 0">
             ${currentSeer.name} · ${date} เวลา ${time} น. (${currentPkg} นาที)<br>
+            วิธีพยากรณ์: ${currentTool}<br>
             เรื่องที่ถาม: ${escapeHtml(topic)}<br>
-            เงินของคุณพักไว้ในระบบอย่างปลอดภัยแล้ว
+            ${currentFiles.length ? `📎 ส่งไฟล์แนบถึงหมอดูแล้ว ${currentFiles.length} ไฟล์<br>` : ""}
+            ชำระผ่าน ${payLabel || "ระบบเดโม"} — เงินของคุณพักไว้ในระบบอย่างปลอดภัยแล้ว
           </p>
           <a href="session.html" class="btn btn-purple mt-2">🎥 เข้าเซสชันเลย (เดโม)</a>
           <button class="btn btn-ghost btn-sm mt-2" id="bk-ics">📅 เพิ่มนัดลงปฏิทิน + เตือนก่อน 30 นาที</button>

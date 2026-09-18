@@ -582,3 +582,51 @@ button { font-family: inherit; cursor: pointer; }
 .seer-card { position: relative; }
 .fav-btn { position: absolute; top: 14px; right: 14px; background: none; border: none; font-size: 1.25rem; cursor: pointer; opacity: .75; transition: transform .15s, opacity .15s; }
 .fav-btn:hover, .fav-btn.active { opacity: 1; transform: scale(1.15); }
+
+/* ---------- เลือกวิธีพยากรณ์ (หน้าจอง) ---------- */
+.tool-pick-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.tool-pick-row .chip { font-size: .82rem; padding: 6px 14px; }
+.tool-pick-row .chip.active {
+  background: var(--gold, #e6b84c); border-color: var(--gold, #e6b84c);
+  color: #1a1005; font-weight: 600;
+}
+
+/* ---------- ขั้นตอนชำระเงิน (เดโม) ---------- */
+.pay-methods { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+@media (max-width: 520px) { .pay-methods { grid-template-columns: 1fr; } }
+.pay-m {
+  padding: 10px 8px; border-radius: 12px; font-size: .85rem;
+  border: 1px solid var(--line); background: rgba(0,0,0,.25); color: var(--text-dim);
+  transition: .2s;
+}
+.pay-m:hover { border-color: var(--purple); color: var(--text); }
+.pay-m.active {
+  border-color: var(--gold); color: var(--gold-soft);
+  background: rgba(230,184,76,.1); font-weight: 600;
+}
+.pay-input {
+  width: 100%; background: rgba(0,0,0,.3); color: inherit;
+  border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px; font: inherit;
+  opacity: .65;
+}
+.qr-box {
+  display: flex; gap: 16px; align-items: center;
+  background: rgba(0,0,0,.25); border: 1px dashed var(--line);
+  border-radius: 12px; padding: 14px; margin-bottom: 14px;
+  font-size: .88rem;
+}
+.qr-mock {
+  width: 108px; height: 108px; flex-shrink: 0; border-radius: 8px;
+  background:
+    repeating-linear-gradient(0deg, #111 0 6px, transparent 6px 12px),
+    repeating-linear-gradient(90deg, #111 0 6px, #fff 6px 12px);
+  border: 6px solid #fff;
+  position: relative;
+}
+.qr-mock::after {
+  content: "เดโม"; position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,.85); color: #333;
+  font-size: .7rem; font-weight: 700; border-radius: 4px;
+  margin: 30px 22px;
+}

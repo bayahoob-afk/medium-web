@@ -102,6 +102,25 @@
     <h3 class="dash-sec-title">💬 รีวิว<span class="em">ล่าสุดจากลูกค้า</span></h3>
     <div class="grid grid-3" id="review-grid"></div>
 
+    <!-- 5.5) เครื่องมือพยากรณ์ของฉัน -->
+    <h3 class="dash-sec-title">🧰 เครื่องมือ<span class="em">พยากรณ์ของฉัน</span></h3>
+    <div class="card" id="tools-card"></div>
+
+    <!-- 5.6) การโอนเงิน & ภาษีหัก ณ ที่จ่าย -->
+    <h3 class="dash-sec-title">💸 การโอนเงิน & <span class="em">ภาษีหัก ณ ที่จ่าย</span></h3>
+    <div class="card" id="payout-account"></div>
+    <div class="table-wrap mt-2">
+      <table class="dash-table">
+        <thead>
+          <tr>
+            <th>รอบโอน</th><th>ยอดขายรวม</th><th>ค่าบริการ 20%</th>
+            <th>หัก ณ ที่จ่าย 3%</th><th>ยอดโอนสุทธิ</th><th>สถานะ</th><th>เอกสาร</th>
+          </tr>
+        </thead>
+        <tbody id="payout-body"></tbody>
+      </table>
+    </div>
+
     <!-- 6) กล่องเตือนนโยบาย -->
     <div class="policy-box mt-4">
       <h3>⚠️ ข้อควรปฏิบัติของหมอดูบนแพลตฟอร์ม</h3>
@@ -135,11 +154,11 @@
     // ---------- ข้อมูล mock ของหน้า dashboard ----------
     // คิวที่กำลังจะมาถึง (gross = นาที × ราคา/นาที ของหมอดู)
     const upcoming = [
-      { dt: "วันนี้ 19:30", customer: "คุณพ.", topic: "ความรัก — จะได้คืนดีไหม", minutes: 30, escrow: "พักในระบบแล้ว", soon: true },
-      { dt: "วันนี้ 21:00", customer: "คุณน.", topic: "เนื้อคู่ปีนี้", minutes: 15, escrow: "พักในระบบแล้ว", soon: true },
-      { dt: "พรุ่งนี้ 10:00", customer: "คุณส.", topic: "การงาน — ย้ายงานดีไหม", minutes: 60, escrow: "พักในระบบแล้ว" },
-      { dt: "พรุ่งนี้ 14:30", customer: "คุณก.", topic: "ดวงโดยรวมครึ่งปีหลัง", minutes: 30, escrow: "พักในระบบแล้ว" },
-      { dt: "18 ก.ย. 18:00", customer: "คุณอ.", topic: "ความรัก — คนคุยคนใหม่", minutes: 30, escrow: "รอชำระเงิน", pending: true }
+      { dt: "วันนี้ 19:30", customer: "คุณพ.", topic: "ความรัก — จะได้คืนดีไหม", tool: "🃏 ไพ่ยิปซี", files: ["รูปคู่กับแฟนเก่า.jpg"], minutes: 30, escrow: "พักในระบบแล้ว", soon: true },
+      { dt: "วันนี้ 21:00", customer: "คุณน.", topic: "เนื้อคู่ปีนี้", tool: "🎴 ไพ่ออราเคิล", minutes: 15, escrow: "พักในระบบแล้ว", soon: true },
+      { dt: "พรุ่งนี้ 10:00", customer: "คุณส.", topic: "การงาน — ย้ายงานดีไหม", tool: "🃏 ไพ่ยิปซี", files: ["jd-งานใหม่.pdf"], minutes: 60, escrow: "พักในระบบแล้ว" },
+      { dt: "พรุ่งนี้ 14:30", customer: "คุณก.", topic: "ดวงโดยรวมครึ่งปีหลัง", tool: "🎲 ลูกเต๋าพยากรณ์", minutes: 30, escrow: "พักในระบบแล้ว" },
+      { dt: "18 ก.ย. 18:00", customer: "คุณอ.", topic: "ความรัก — คนคุยคนใหม่", tool: "🃏 ไพ่ยิปซี", minutes: 30, escrow: "รอชำระเงิน", pending: true }
     ];
 
     // เซสชันที่ผ่านมา (grossนาที ให้คำนวณสุทธิหลังหัก 20%)
@@ -208,7 +227,7 @@
       <div class="card stat-card">
         <h3>🔒 ยอดเงินรอโอน (escrow)</h3>
         <div class="num">${baht(escrowPending)}</div>
-        <div class="sub">โอนเข้าบัญชีหลังจบเซสชัน + ส่งสรุปแล้ว</div>
+        <div class="sub">โอนทุกศุกร์หลังจบเซสชัน+ส่งสรุป · หักภาษี ณ ที่จ่าย 3% ก่อนโอน</div>
       </div>`;
 
     // ---------- 3) คิวที่กำลังจะมาถึง ----------
@@ -218,7 +237,9 @@
         <tr>
           <td style="white-space:nowrap">${q.soon ? "🔴 " : ""}${q.dt}</td>
           <td>${q.customer}</td>
-          <td>${q.topic}</td>
+          <td>${q.topic}
+            <div style="font-size:.75rem;color:var(--text-faint)">${q.tool || ""}${q.files ? ` · 📎 ${q.files.join(", ")}` : ""}</div>
+          </td>
           <td style="white-space:nowrap">${q.minutes} นาที</td>
           <td style="white-space:nowrap"><b class="gold">${baht(price)}</b></td>
           <td style="white-space:nowrap">
@@ -250,6 +271,106 @@
         <p style="margin:10px 0">"${r.text}"</p>
         <div class="seer-title">— ${r.name}</div>
       </div>`).join("");
+
+    // ---------- 5.5) เครื่องมือพยากรณ์ของฉัน ----------
+    // หมอดูเลือกเครื่องมือที่ใช้จริง — ลูกค้าจะเลือกได้เฉพาะจากรายการนี้ตอนจองคิว
+    const ALL_TOOLS = [
+      "🃏 ไพ่ยิปซี", "🎴 ไพ่ออราเคิล", "🎲 ลูกเต๋าพยากรณ์", "📜 ผูกดวงชะตา",
+      "🗓️ หาฤกษ์มงคล", "🕯️ เสี่ยงทายธูปเทียน", "🔢 เลขศาสตร์", "📱 เบอร์มงคล",
+      "🖐️ ลายมือ", "👤 โหงวเฮ้ง", "🪐 โหรายูเรเนียน", "👁️ จิตสัมผัส",
+      "🖼️ ดูจากรูปถ่าย", "🧭 ฮวงจุ้ย", "🐉 ปาจื่อ/ดวงจีน", "🌸 ซาจูเกาหลี",
+      "💞 ดวงสมพงศ์", "🛕 โหราเขมร", "🕯️ อ่านพลังงาน"
+    ];
+    const TOOLS_KEY = "medium_seer_tools_" + me.id;
+    function myTools() {
+      try {
+        const o = JSON.parse(localStorage.getItem(TOOLS_KEY));
+        if (Array.isArray(o) && o.length) return o;
+      } catch (e) { /* ใช้ค่าเริ่มต้น */ }
+      return me.tools || [];
+    }
+    function renderTools() {
+      const mine = myTools();
+      document.getElementById("tools-card").innerHTML = `
+        <p class="muted" style="font-size:.9rem;margin-bottom:12px">
+          เปิดเฉพาะเครื่องมือที่คุณใช้พยากรณ์จริง — ลูกค้าจะเห็นและเลือกได้จากรายการนี้ตอนจองคิว</p>
+        <div class="tool-pick-row">
+          ${ALL_TOOLS.map(t => `<button class="chip tool-pick ${mine.includes(t) ? "active" : ""}" data-tool="${t}">${t}</button>`).join("")}
+        </div>
+        <p class="muted" style="font-size:.78rem;margin-top:10px">
+          เปิดอยู่ ${mine.length} เครื่องมือ · ต้องเปิดอย่างน้อย 1 · บันทึกอัตโนมัติ</p>`;
+      document.querySelectorAll("#tools-card .tool-pick").forEach(b => b.onclick = () => {
+        let mine = myTools();
+        if (mine.includes(b.dataset.tool)) {
+          if (mine.length === 1) return; // ต้องเหลืออย่างน้อย 1
+          mine = mine.filter(t => t !== b.dataset.tool);
+        } else mine = [...mine, b.dataset.tool];
+        try { localStorage.setItem(TOOLS_KEY, JSON.stringify(mine)); } catch (e) { /* private mode */ }
+        renderTools();
+      });
+    }
+    renderTools();
+
+    // ---------- 5.6) การโอนเงิน & ภาษีหัก ณ ที่จ่าย ----------
+    // แพลตฟอร์ม (นิติบุคคล) จ่ายค่าบริการให้หมอดู → มีหน้าที่หักภาษี ณ ที่จ่าย 3%
+    // ของยอดหลังหักค่าบริการแพลตฟอร์ม แล้วนำส่งกรมสรรพากร พร้อมออกหนังสือรับรอง (50 ทวิ)
+    const WHT = 0.03;
+    document.getElementById("payout-account").innerHTML = `
+      <div style="display:flex;gap:20px;flex-wrap:wrap;align-items:center;justify-content:space-between">
+        <div>
+          <p style="font-size:.95rem"><b>🏦 บัญชีรับเงิน:</b> ธ.กสิกรไทย ••• 123-4 (${me.name})</p>
+          <p class="muted" style="font-size:.85rem;margin-top:4px">
+            รอบโอน: ทุกวันศุกร์ · โอนเฉพาะเซสชันที่จบ + ส่งสรุปคำทำนายแล้ว</p>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="alert('เดโม — ระบบจริงจะยืนยันตัวตน (KYC) ก่อนเปลี่ยนบัญชี')">แก้ไขบัญชี</button>
+      </div>
+      <p class="muted" style="font-size:.8rem;margin-top:12px;border-top:1px dashed var(--line);padding-top:10px">
+        📌 แพลตฟอร์มหักภาษี ณ ที่จ่าย 3% ของยอดหลังหักค่าบริการ นำส่งกรมสรรพากรแทนคุณทุกรอบโอน
+        และออกหนังสือรับรองการหักภาษี (50 ทวิ) ให้ดาวน์โหลดด้านล่าง · คุณยังมีหน้าที่ยื่นภาษีเงินได้บุคคลธรรมดาประจำปี (เงินได้ 40(2))</p>`;
+
+    const payoutRounds = [
+      { period: "15–21 ก.ย. 2569", gross: upcoming.filter(q => !q.pending).reduce((s, q) => s + q.minutes * me.pricePerMin, 0) + 12750, status: "รอจบรอบ · โอนศุกร์นี้", open: true },
+      { period: "8–14 ก.ย. 2569", gross: 31500, status: "โอนแล้ว 15 ก.ย." },
+      { period: "1–7 ก.ย. 2569", gross: 28250, status: "โอนแล้ว 8 ก.ย." },
+      { period: "25–31 ส.ค. 2569", gross: 24000, status: "โอนแล้ว 1 ก.ย." }
+    ];
+    document.getElementById("payout-body").innerHTML = payoutRounds.map(r => {
+      const fee = Math.round(r.gross * FEE);
+      const afterFee = r.gross - fee;
+      const wht = Math.round(afterFee * WHT);
+      const netPay = afterFee - wht;
+      return `
+        <tr>
+          <td style="white-space:nowrap">${r.period}</td>
+          <td style="white-space:nowrap">${baht(r.gross)}</td>
+          <td style="white-space:nowrap;color:var(--text-faint)">−${baht(fee)}</td>
+          <td style="white-space:nowrap;color:var(--text-faint)">−${baht(wht)}</td>
+          <td style="white-space:nowrap"><b class="gold">${baht(netPay)}</b></td>
+          <td style="white-space:nowrap">${r.open ? '<span class="badge">⏳ ' + r.status + "</span>" : '<span class="badge badge-ok">✓ ' + r.status + "</span>"}</td>
+          <td>${r.open ? '<span class="muted" style="font-size:.8rem">ออกหลังโอน</span>'
+            : `<button class="btn btn-ghost btn-sm" onclick="download50Tawi('${r.period}', ${afterFee}, ${wht})">📄 50 ทวิ</button>`}</td>
+        </tr>`;
+    }).join("");
+
+    // หนังสือรับรองหักภาษี ณ ที่จ่าย (ไฟล์ตัวอย่างสำหรับเดโม)
+    function download50Tawi(period, base, wht) {
+      const txt = [
+        "หนังสือรับรองการหักภาษี ณ ที่จ่าย (50 ทวิ) — เอกสารตัวอย่างเดโม",
+        "==============================================",
+        "ผู้จ่ายเงิน: บริษัท มีเดียม แพลตฟอร์ม จำกัด (เดโม)",
+        "ผู้รับเงิน: " + me.name,
+        "รอบจ่าย: " + period,
+        "ประเภทเงินได้: ค่าบริการ (มาตรา 40(2))",
+        "จำนวนเงินที่จ่าย: " + base.toLocaleString("th-TH") + " บาท",
+        "ภาษีหัก ณ ที่จ่าย (3%): " + wht.toLocaleString("th-TH") + " บาท",
+        "",
+        "* เอกสารนี้เป็นตัวอย่างจากระบบเดโม ไม่มีผลทางกฎหมาย"
+      ].join("\n");
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(new Blob(["﻿" + txt], { type: "text/plain;charset=utf-8" }));
+      a.download = "50tawi-demo.txt";
+      document.body.appendChild(a); a.click(); a.remove();
+    }
   </script>
 </body>
 </html>
