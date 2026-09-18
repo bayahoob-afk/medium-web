@@ -49,6 +49,12 @@
         <h3>3) เลือกลายมงคล</h3>
         <div id="style-chips" style="display:flex;gap:8px;flex-wrap:wrap"></div>
 
+        <h3>4) โทนสี</h3>
+        <div id="tone-chips" style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="chip tone-chip active" data-tone="dark">🌙 ม่วงราตรี (ซิกเนเจอร์ Medium)</button>
+          <button class="chip tone-chip" data-tone="pastel">🌸 พาสเทลละมุน</button>
+        </div>
+
         <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:18px">
           <button class="btn btn-gold" id="wp-download">⬇️ ดาวน์โหลดฟรี</button>
           <button class="btn btn-purple" id="wp-share">📤 แชร์ให้เพื่อน</button>
@@ -71,7 +77,7 @@
   <script src="assets/js/daily.js"></script>
   <script src="assets/js/sharecard.js"></script>
   <script>
-    let goal = "money", wallStyle = "tarot", manualGoal = false;
+    let goal = "money", wallStyle = "tarot", wallTone = "dark", manualGoal = false;
     const dobInput = document.getElementById("wp-dob");
     const preview = document.getElementById("wp-canvas");
 
@@ -97,7 +103,7 @@
       `<button class="chip style-chip ${k === wallStyle ? "active" : ""}" data-style="${k}">${label}</button>`).join("");
 
     function makeCanvas() {
-      return MEDIUM_CARD.drawWallpaper({ goal, style: wallStyle, dob: dobInput.value || null });
+      return MEDIUM_CARD.drawWallpaper({ goal, style: wallStyle, tone: wallTone, dob: dobInput.value || null });
     }
     function renderPreview() {
       const src = makeCanvas();
@@ -134,6 +140,13 @@
       styleChips.querySelectorAll(".chip").forEach(c => c.classList.toggle("active", c === chip));
       renderPreview();
     });
+    document.getElementById("tone-chips").addEventListener("click", e => {
+      const chip = e.target.closest(".tone-chip");
+      if (!chip) return;
+      wallTone = chip.dataset.tone;
+      document.querySelectorAll(".tone-chip").forEach(c => c.classList.toggle("active", c === chip));
+      renderPreview();
+    });
     dobInput.addEventListener("change", () => {
       if (dobInput.value) window.MEDIUM_DAILY.saveProfile({ ...(profile || {}), dob: dobInput.value });
       updateRec(true);
@@ -141,9 +154,9 @@
     });
 
     document.getElementById("wp-download").onclick = () =>
-      MEDIUM_CARD.download(makeCanvas(), "medium-wallpaper-" + goal + "-" + wallStyle + ".png");
+      MEDIUM_CARD.download(makeCanvas(), "medium-wallpaper-" + goal + "-" + wallStyle + "-" + wallTone + ".png");
     document.getElementById("wp-share").onclick = () =>
-      MEDIUM_CARD.share(makeCanvas(), "medium-wallpaper-" + goal + "-" + wallStyle + ".png",
+      MEDIUM_CARD.share(makeCanvas(), "medium-wallpaper-" + goal + "-" + wallStyle + "-" + wallTone + ".png",
         "🔮 วอลเปเปอร์เสริมดวงของฉันจาก Medium — สร้างของคุณเองฟรีที่ " + location.href);
 
     updateRec(true);

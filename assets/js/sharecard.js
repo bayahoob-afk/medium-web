@@ -18,10 +18,10 @@ window.MEDIUM_CARD = (function () {
   ];
 
   const GOALS = {
-    money: { label: "เสริมการเงิน มั่งคั่ง", emoji: "💰", bless: "ทรัพย์ไหลมา งานปัง เงินคล่องตัว", g1: "#3a2a00", g2: "#0f0a00", accent: "#f5c542" },
-    love: { label: "เสริมความรัก เมตตามหานิยม", emoji: "💗", bless: "เสน่ห์เปล่งประกาย คนรักดูแล คนรอบข้างเมตตา", g1: "#3a0022", g2: "#14000c", accent: "#ff7eb6" },
-    luck: { label: "เสริมโชคลาภ แคล้วคลาด", emoji: "🍀", bless: "โชคเข้าข้าง เดินทางแคล้วคลาดปลอดภัย", g1: "#00301f", g2: "#00140d", accent: "#5fe0a5" },
-    work: { label: "เสริมการงาน บารมี", emoji: "💼", bless: "งานราบรื่น ผู้ใหญ่เอ็นดู บารมีโดดเด่น", g1: "#131f45", g2: "#080c1f", accent: "#8ab6ff" }
+    money: { label: "เสริมการเงิน มั่งคั่ง", emoji: "💰", bless: "ทรัพย์ไหลมา งานปัง เงินคล่องตัว", g1: "#3a2a00", g2: "#0f0a00", accent: "#f5c542", p1: "#fdf4de", p2: "#f4dfae", pa: "#a2761c" },
+    love: { label: "เสริมความรัก เมตตามหานิยม", emoji: "💗", bless: "เสน่ห์เปล่งประกาย คนรักดูแล คนรอบข้างเมตตา", g1: "#3a0022", g2: "#14000c", accent: "#ff7eb6", p1: "#fdecf3", p2: "#f8d2e2", pa: "#c04a7e" },
+    luck: { label: "เสริมโชคลาภ แคล้วคลาด", emoji: "🍀", bless: "โชคเข้าข้าง เดินทางแคล้วคลาดปลอดภัย", g1: "#00301f", g2: "#00140d", accent: "#5fe0a5", p1: "#eaf8ee", p2: "#cfeeda", pa: "#2e8b5f" },
+    work: { label: "เสริมการงาน บารมี", emoji: "💼", bless: "งานราบรื่น ผู้ใหญ่เอ็นดู บารมีโดดเด่น", g1: "#131f45", g2: "#080c1f", accent: "#8ab6ff", p1: "#ecf2fd", p2: "#d4e2f7", pa: "#3c62a8" }
   };
 
   function roundRect(ctx, x, y, w, h, r) {
@@ -140,12 +140,24 @@ window.MEDIUM_CARD = (function () {
     lotus: "🪷 บัวทองผลิบาน"
   };
 
-  // เทพมงคลประจำด้าน — นำเสนอเชิงสัญลักษณ์อย่างเคารพ (ชื่อ + สัญลักษณ์ + คำขอพร)
+  // เทพมงคลประจำด้าน — นำเสนอเชิงสัญลักษณ์อย่างเคารพ (ชื่อ + สัญลักษณ์ + คำขอพร + ไพ่ประจำองค์)
   const GOAL_DEITY = {
-    money: { name: "ท้าวเวสสุวรรณ", e: "🪔", wish: "ขอบารมีคุ้มครอง ทรัพย์สินมั่งคั่ง กันสิ่งไม่ดีทั้งปวง" },
-    love: { name: "พระแม่ลักษมี", e: "🪷", wish: "ขอความรักงอกงาม เสน่ห์เมตตามหานิยม ครอบครัวอบอุ่น" },
-    luck: { name: "พระพิฆเนศ", e: "🐘", wish: "ขอความสำเร็จสมปรารถนา อุปสรรคมลายสิ้น โชคลาภเข้ามา" },
-    work: { name: "พญาครุฑ", e: "🦅", wish: "ขออำนาจบารมี หน้าที่การงานก้าวหน้า มั่นคงเป็นสง่า" }
+    money: {
+      name: "ท้าวเวสสุวรรณ", e: "🪔", wish: "ขอบารมีคุ้มครอง ทรัพย์สินมั่งคั่ง กันสิ่งไม่ดีทั้งปวง",
+      cards: [{ n: "The Emperor", r: "IV", icon: "emperor" }, { n: "Wheel of Fortune", r: "X", icon: "wheel" }]
+    },
+    love: {
+      name: "พระแม่ลักษมี", e: "🪷", wish: "ขอความรักงอกงาม เสน่ห์เมตตามหานิยม ครอบครัวอบอุ่น",
+      cards: [{ n: "The Lovers", r: "VI", icon: "lovers" }, { n: "The Empress", r: "III", icon: "empress" }]
+    },
+    luck: {
+      name: "พระพิฆเนศ", e: "🐘", wish: "ขอความสำเร็จสมปรารถนา อุปสรรคมลายสิ้น โชคลาภเข้ามา",
+      cards: [{ n: "The Chariot", r: "VII", icon: "chariot" }, { n: "Wheel of Fortune", r: "X", icon: "wheel" }]
+    },
+    work: {
+      name: "พญาครุฑ", e: "🦅", wish: "ขออำนาจบารมี หน้าที่การงานก้าวหน้า มั่นคงเป็นสง่า",
+      cards: [{ n: "The Emperor", r: "IV", icon: "emperor" }, { n: "The Magician", r: "I", icon: "magician" }]
+    }
   };
 
   // ไพ่เสริมดวงประจำแต่ละด้าน (วาดเองทั้งใบ ไม่ใช้ภาพสำรับลิขสิทธิ์)
@@ -268,9 +280,10 @@ window.MEDIUM_CARD = (function () {
   };
 
   // ไพ่ทาโรต์ใบเล็กสไตล์พรีเมียม: พื้นน้ำเงินราตรี กรอบทอง ไอคอนลายเส้นทอง ชื่อ serif
-  function miniCard(ctx, cx, cy, rot, card) {
+  function miniCard(ctx, cx, cy, rot, card, scale) {
     const w = 260, h = 420;
     ctx.save(); ctx.translate(cx, cy); ctx.rotate(rot);
+    if (scale) ctx.scale(scale, scale);
     ctx.shadowColor = "rgba(0,0,0,.6)"; ctx.shadowBlur = 36; ctx.shadowOffsetY = 14;
     roundRect(ctx, -w / 2, -h / 2, w, h, 18);
     const face = ctx.createLinearGradient(0, -h / 2, 0, h / 2);
@@ -292,6 +305,10 @@ window.MEDIUM_CARD = (function () {
     ctx.textAlign = "center"; ctx.fillStyle = CARD_GOLD;
     ctx.font = "700 34px " + SERIF;
     ctx.fillText(card.r, 0, -h / 2 + 68);
+    // ตราจันทร์-ดาวประจำสำรับ Medium (ลายเดียวกับหลังไพ่ในเว็บ)
+    ctx.globalAlpha = 0.6; ctx.font = "20px " + FONT;
+    ctx.fillText("✦ ☾ ✦", 0, -h / 2 + 100);
+    ctx.globalAlpha = 1;
     // ไอคอนลายเส้นทองกลางไพ่
     ctx.save(); ctx.translate(0, 14);
     ctx.strokeStyle = CARD_GOLD; ctx.lineWidth = 5;
@@ -408,10 +425,14 @@ window.MEDIUM_CARD = (function () {
     const goalKey = GOALS[opts.goal] ? opts.goal : "money";
     const goal = GOALS[goalKey];
     const styleKey = WALL_STYLES[opts.style] ? opts.style : "tarot";
+    const pastel = opts.tone === "pastel";
+    const ac = pastel ? goal.pa : goal.accent;          // สีเน้นตามโทน
+    const tMain = pastel ? "#413352" : "#ffffff";        // สีข้อความหลัก
+    const tSub = pastel ? "rgba(65,51,82,.72)" : "rgba(255,255,255,.85)";
     const dob = opts.dob || null;
     const dayIdx = dob ? new Date(dob).getDay() : new Date().getDay();
     const day = DAY_META[dayIdx] || DAY_META[0];
-    const seedStr = (dob || "guest") + "|" + goalKey + "|" + styleKey;
+    const seedStr = (dob || "guest") + "|" + goalKey + "|" + styleKey + "|" + (pastel ? "p" : "d");
     let seed = 5381;
     for (let i = 0; i < seedStr.length; i++) seed = ((seed << 5) + seed + seedStr.charCodeAt(i)) >>> 0;
     const luckyNum = (seed % 9) + 1;          // เลขหลักเดียว (ลายคลาสสิก)
@@ -422,13 +443,23 @@ window.MEDIUM_CARD = (function () {
     const ctx = c.getContext("2d");
 
     const bg = ctx.createLinearGradient(0, 0, 0, H);
-    bg.addColorStop(0, goal.g1); bg.addColorStop(0.55, goal.g2); bg.addColorStop(1, "#050308");
+    if (pastel) { bg.addColorStop(0, goal.p1); bg.addColorStop(0.6, goal.p2); bg.addColorStop(1, "#efdcc0"); }
+    else { bg.addColorStop(0, goal.g1); bg.addColorStop(0.55, goal.g2); bg.addColorStop(1, "#0b0618"); }
     ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
-    stars(ctx, W, H, 160, seed);
+    // ลายเซ็นแบรนด์ Medium: แสงม่วง-ชมพูแบบเดียวกับพื้นหลังเว็บ (Mystic Modern)
+    const sig1 = ctx.createRadialGradient(W * 0.82, H * 0.08, 0, W * 0.82, H * 0.08, 700);
+    sig1.addColorStop(0, pastel ? "rgba(139,92,246,.12)" : "rgba(139,92,246,.22)");
+    sig1.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = sig1; ctx.fillRect(0, 0, W, H);
+    const sig2 = ctx.createRadialGradient(W * 0.08, H * 0.35, 0, W * 0.08, H * 0.35, 550);
+    sig2.addColorStop(0, pastel ? "rgba(244,114,182,.08)" : "rgba(244,114,182,.10)");
+    sig2.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = sig2; ctx.fillRect(0, 0, W, H);
+    if (!pastel) stars(ctx, W, H, 160, seed);
 
     // แสงเรืองกลางภาพ
     const glow = ctx.createRadialGradient(W / 2, 980, 60, W / 2, 980, 620);
-    glow.addColorStop(0, goal.accent + "33"); glow.addColorStop(1, "rgba(0,0,0,0)");
+    glow.addColorStop(0, ac + (pastel ? "22" : "33")); glow.addColorStop(1, "rgba(0,0,0,0)");
     ctx.fillStyle = glow; ctx.fillRect(0, 0, W, H);
 
     // โบเก้ทองนุ่ม ๆ (ตำแหน่งจาก seed) + ขอบมืดวินเยตต์ ให้ภาพมีมิติ
@@ -437,12 +468,13 @@ window.MEDIUM_CARD = (function () {
     for (let i = 0; i < 7; i++) {
       const bx = rndB() * W, by = rndB() * H * 0.72, br = 50 + rndB() * 95;
       const bok = ctx.createRadialGradient(bx, by, 0, bx, by, br);
-      bok.addColorStop(0, goal.accent + "30"); bok.addColorStop(1, "rgba(0,0,0,0)");
+      bok.addColorStop(0, ac + (pastel ? "26" : "30")); bok.addColorStop(1, "rgba(0,0,0,0)");
       ctx.fillStyle = bok;
       ctx.beginPath(); ctx.arc(bx, by, br, 0, Math.PI * 2); ctx.fill();
     }
     const vig = ctx.createRadialGradient(W / 2, H / 2, H * 0.28, W / 2, H / 2, H * 0.72);
-    vig.addColorStop(0, "rgba(0,0,0,0)"); vig.addColorStop(1, "rgba(0,0,0,.5)");
+    vig.addColorStop(0, "rgba(0,0,0,0)");
+    vig.addColorStop(1, pastel ? "rgba(122,90,30,.14)" : "rgba(0,0,0,.5)");
     ctx.fillStyle = vig; ctx.fillRect(0, 0, W, H);
 
     // กรอบทองรอบภาพ + มุมหนาแบบกรอบรูปพรีเมียม
@@ -471,21 +503,24 @@ window.MEDIUM_CARD = (function () {
     if (styleKey === "tarot") {
       // สไตล์ยอดนิยม: คำอังกฤษ serif ทองฟอยล์ + ไพ่ 3 ใบซ้อน + เลข 3 หลัก
       goldText(ctx, GOAL_EN[goalKey], W / 2, 345, 168, 700, true, 16);
-      ctx.fillStyle = "#fff"; ctx.font = "600 46px " + FONT;
+      ctx.fillStyle = tMain; ctx.font = "600 46px " + FONT;
       ctx.fillText(goal.label, W / 2, 435);
       const cards = GOAL_CARDS[goalKey];
       miniCard(ctx, W / 2 - 265, 850, -0.16, cards[0]);
       miniCard(ctx, W / 2 + 265, 850, 0.16, cards[2]);
       miniCard(ctx, W / 2, 805, 0, cards[1]);
       goldText(ctx, String(luckyNum3), W / 2, 1450, 240, 700, true, 10);
-      ctx.fillStyle = goal.accent; ctx.font = "600 38px " + FONT;
+      ctx.fillStyle = ac; ctx.font = "600 38px " + FONT;
       ctx.fillText("เลขนำโชคประจำดวงคุณ", W / 2, 1530);
-      ctx.fillStyle = "#fff"; ctx.font = "500 38px " + FONT;
+      ctx.fillStyle = tMain; ctx.font = "500 38px " + FONT;
       wrap(ctx, goal.bless, W - 240).forEach((l, i) => ctx.fillText(l, W / 2, 1610 + i * 56));
     } else if (styleKey === "deity") {
-      // คอลเลกชันเทพมงคล: รัศมี + สัญลักษณ์ + ชื่อเทพอักษรทอง + คำขอพร
-      const d = GOAL_DEITY[goalKey], cy = 560;
-      ctx.strokeStyle = goal.accent; ctx.lineWidth = 3;
+      // คอลเลกชันเทพมงคล: รัศมี + สัญลักษณ์ + ไพ่ประจำองค์ขนาบ + ชื่อเทพอักษรทอง
+      const d = GOAL_DEITY[goalKey], cy = 540;
+      // ไพ่ประจำองค์ 2 ใบขนาบซุ้ม (วาดก่อนให้ซุ้มอยู่หน้า)
+      miniCard(ctx, W / 2 - 350, cy + 210, -0.22, d.cards[0], 0.62);
+      miniCard(ctx, W / 2 + 350, cy + 210, 0.22, d.cards[1], 0.62);
+      ctx.strokeStyle = ac; ctx.lineWidth = 3;
       [225, 258].forEach(r => { ctx.beginPath(); ctx.arc(W / 2, cy, r, 0, Math.PI * 2); ctx.stroke(); });
       for (let i = 0; i < 16; i++) { // รัศมีรอบซุ้ม
         const a = i * Math.PI / 8;
@@ -494,6 +529,12 @@ window.MEDIUM_CARD = (function () {
         ctx.lineTo(W / 2 + Math.cos(a) * (i % 2 ? 300 : 330), cy + Math.sin(a) * (i % 2 ? 300 : 330));
         ctx.stroke();
       }
+      // พื้นวงในทึบเล็กน้อยให้องค์เด่นเหนือไพ่
+      const inner = ctx.createRadialGradient(W / 2, cy, 40, W / 2, cy, 225);
+      inner.addColorStop(0, pastel ? "rgba(255,252,244,.9)" : "rgba(12,7,26,.88)");
+      inner.addColorStop(1, pastel ? "rgba(255,252,244,.25)" : "rgba(12,7,26,.15)");
+      ctx.fillStyle = inner;
+      ctx.beginPath(); ctx.arc(W / 2, cy, 225, 0, Math.PI * 2); ctx.fill();
       ctx.font = "230px " + FONT;
       ctx.fillText(d.e, W / 2, cy + 80);
       // ฐานกลีบบัวไล่เฉดรองรับซุ้ม
@@ -503,50 +544,73 @@ window.MEDIUM_CARD = (function () {
         ctx.quadraticCurveTo(27, -42, 0, -80);
         ctx.quadraticCurveTo(-27, -42, 0, 0); ctx.closePath();
         const pg = ctx.createLinearGradient(0, -80, 0, 0);
-        pg.addColorStop(0, goal.accent + "d0"); pg.addColorStop(1, goal.accent + "28");
+        pg.addColorStop(0, ac + "d0"); pg.addColorStop(1, ac + "28");
         ctx.fillStyle = pg; ctx.fill(); ctx.restore();
       }
-      goldText(ctx, d.name, W / 2, 1030, 108);
-      ctx.fillStyle = "#fff"; ctx.font = "500 42px " + FONT;
-      wrap(ctx, d.wish, W - 240).forEach((l, i) => ctx.fillText(l, W / 2, 1120 + i * 62));
-      goldText(ctx, String(luckyNum3), W / 2, 1480, 220, 700, true, 10);
-      ctx.fillStyle = goal.accent; ctx.font = "600 38px " + FONT;
-      ctx.fillText("เลขนำโชคประจำดวงคุณ · " + goal.label, W / 2, 1560);
+      goldText(ctx, d.name, W / 2, 1050, 108);
+      ctx.fillStyle = tMain; ctx.font = "500 42px " + FONT;
+      wrap(ctx, d.wish, W - 240).forEach((l, i) => ctx.fillText(l, W / 2, 1140 + i * 62));
+      ctx.fillStyle = tSub; ctx.font = "32px " + FONT;
+      ctx.fillText("ไพ่ประจำองค์: " + d.cards.map(c => c.n).join(" · "), W / 2, 1300);
+      goldText(ctx, String(luckyNum3), W / 2, 1520, 210, 700, true, 10);
+      ctx.fillStyle = ac; ctx.font = "600 38px " + FONT;
+      ctx.fillText("เลขนำโชคประจำดวงคุณ · " + goal.label, W / 2, 1600);
     } else {
       // ลายคลาสสิก: ลวดลายตอนบน + เลขหลักเดียวในวงแหวน
-      MOTIFS[styleKey](ctx, W, goal.accent, seed, goal.g1);
-      ctx.fillStyle = "#fff";
+      MOTIFS[styleKey](ctx, W, ac, seed, pastel ? goal.p1 : goal.g1);
+      ctx.fillStyle = tMain;
       ctx.font = "150px " + FONT;
       ctx.fillText(goal.emoji, W / 2, 860);
-      ctx.fillStyle = goal.accent;
+      ctx.fillStyle = ac;
       ctx.font = "700 58px " + FONT;
       ctx.fillText(goal.label, W / 2, 990);
-      ctx.fillStyle = "#fff";
+      ctx.fillStyle = tMain;
       ctx.font = "500 40px " + FONT;
       wrap(ctx, goal.bless, W - 220).forEach((l, i) => ctx.fillText(l, W / 2, 1070 + i * 60));
 
-      ctx.strokeStyle = goal.accent; ctx.lineWidth = 6;
+      ctx.strokeStyle = ac; ctx.lineWidth = 6;
       ctx.beginPath(); ctx.arc(W / 2, 1440, 150, 0, Math.PI * 2); ctx.stroke();
-      ctx.strokeStyle = goal.accent + "55"; ctx.lineWidth = 2;
+      ctx.strokeStyle = ac + "55"; ctx.lineWidth = 2;
       ctx.beginPath(); ctx.arc(W / 2, 1440, 168, 0, Math.PI * 2); ctx.stroke();
-      ctx.fillStyle = "#fff";
+      ctx.fillStyle = tMain;
       ctx.font = "700 170px " + FONT;
       ctx.fillText(String(luckyNum), W / 2, 1500);
-      ctx.fillStyle = goal.accent;
+      ctx.fillStyle = ac;
       ctx.font = "600 38px " + FONT;
       ctx.fillText("เลขนำโชคประจำดวงคุณ", W / 2, 1680);
     }
 
-    ctx.fillStyle = "rgba(255,255,255,.85)";
+    ctx.fillStyle = tSub;
     ctx.font = "36px " + FONT;
     ctx.fillText((dob ? "เกิดวัน" : "วัน") + day.d + " · สีมงคล: " + day.lucky, W / 2, 1780);
 
-    ctx.fillStyle = "rgba(255,255,255,.5)";
-    ctx.font = "30px " + FONT;
-    ctx.fillText("วอลเปเปอร์เสริมดวง — เพื่อความบันเทิงและกำลังใจ", W / 2, 2180);
-    ctx.fillStyle = goal.accent;
-    ctx.font = "600 32px " + FONT;
-    ctx.fillText("🔮 สร้างของคุณเองฟรีที่ " + siteMark(), W / 2, 2240);
+    // ---------- ลายเซ็นแบรนด์ MEDIUM (โลโก้เดียวกับ navbar เว็บ) ----------
+    const by = 2170;
+    ctx.font = "700 60px " + FONT;
+    const wMED = ctx.measureText("MED").width, wIUM = ctx.measureText("IUM").width;
+    const orbR = 26, gapO = 18, totalW = orbR * 2 + gapO + wMED + wIUM;
+    let bx = W / 2 - totalW / 2 + orbR;
+    // ลูกแก้วพยากรณ์วาดเอง: ทรงกลมม่วงไล่เฉด + ไฮไลต์ + ฐานทอง
+    const orb = ctx.createRadialGradient(bx - 8, by - 30, 4, bx, by - 20, orbR + 4);
+    orb.addColorStop(0, "#e6dcff"); orb.addColorStop(0.35, "#8b5cf6"); orb.addColorStop(1, "#3b2470");
+    ctx.fillStyle = orb;
+    ctx.beginPath(); ctx.arc(bx, by - 20, orbR, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = "rgba(255,255,255,.85)";
+    ctx.beginPath(); ctx.ellipse(bx - 9, by - 31, 6, 3.6, -0.6, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = CARD_GOLD; ctx.lineWidth = 4;
+    ctx.beginPath(); ctx.arc(bx, by + 13, 15, Math.PI * 1.15, Math.PI * 1.85, true); ctx.stroke();
+    // MED (สีข้อความหลัก) + IUM (ทองฟอยล์) ต่อกันแบบโลโก้เว็บ
+    ctx.textAlign = "left"; ctx.font = "700 60px " + FONT;
+    ctx.fillStyle = tMain;
+    ctx.fillText("MED", bx + orbR + gapO, by);
+    const gIUM = ctx.createLinearGradient(0, by - 52, 0, by);
+    gIUM.addColorStop(0, "#fff3cf"); gIUM.addColorStop(0.5, "#f0c95e"); gIUM.addColorStop(1, "#9c7418");
+    ctx.fillStyle = gIUM;
+    ctx.fillText("IUM", bx + orbR + gapO + wMED, by);
+    ctx.textAlign = "center";
+    ctx.fillStyle = pastel ? "rgba(65,51,82,.6)" : "rgba(255,255,255,.55)";
+    ctx.font = "28px " + FONT;
+    ctx.fillText("วอลเปเปอร์เสริมดวง — เพื่อความบันเทิงและกำลังใจ · สร้างฟรีที่ " + siteMark(), W / 2, by + 62);
     return c;
   }
 
