@@ -151,45 +151,159 @@ window.MEDIUM_CARD = (function () {
   // ไพ่เสริมดวงประจำแต่ละด้าน (วาดเองทั้งใบ ไม่ใช้ภาพสำรับลิขสิทธิ์)
   const GOAL_EN = { money: "MONEY", love: "LOVE", luck: "LUCKY", work: "POWER" };
   const GOAL_CARDS = {
-    money: [{ n: "The Sun", r: "XIX", e: "☀️" }, { n: "Wheel of Fortune", r: "X", e: "🎡" }, { n: "The Empress", r: "III", e: "🌾" }],
-    love: [{ n: "The Lovers", r: "VI", e: "💞" }, { n: "The Star", r: "XVII", e: "⭐" }, { n: "The Sun", r: "XIX", e: "☀️" }],
-    luck: [{ n: "The Star", r: "XVII", e: "⭐" }, { n: "The World", r: "XXI", e: "🌍" }, { n: "Wheel of Fortune", r: "X", e: "🎡" }],
-    work: [{ n: "The Emperor", r: "IV", e: "🏛️" }, { n: "The Magician", r: "I", e: "✨" }, { n: "The Chariot", r: "VII", e: "🏇" }]
+    money: [{ n: "The Sun", r: "XIX", icon: "sun" }, { n: "Wheel of Fortune", r: "X", icon: "wheel" }, { n: "The Empress", r: "III", icon: "empress" }],
+    love: [{ n: "The Lovers", r: "VI", icon: "lovers" }, { n: "The Star", r: "XVII", icon: "star" }, { n: "The Sun", r: "XIX", icon: "sun" }],
+    luck: [{ n: "The Star", r: "XVII", icon: "star" }, { n: "The World", r: "XXI", icon: "world" }, { n: "Wheel of Fortune", r: "X", icon: "wheel" }],
+    work: [{ n: "The Emperor", r: "IV", icon: "emperor" }, { n: "The Magician", r: "I", icon: "magician" }, { n: "The Chariot", r: "VII", icon: "chariot" }]
   };
   const GOAL_DECO = { money: "🪙", love: "💗", luck: "🍀", work: "👑" };
 
-  // ตัวอักษรลายทองฟอยล์ + แสงเรือง
-  function goldText(ctx, text, x, y, size, weight) {
-    ctx.font = (weight || 800) + " " + size + "px " + FONT;
+  // ตัวอักษรลายทองฟอยล์ + แสงเรือง — serif สำหรับหัวเรื่อง/ตัวเลขให้ดูพรีเมียม
+  const SERIF = "Georgia,'Times New Roman',serif";
+  function goldText(ctx, text, x, y, size, weight, serif, spacing) {
+    ctx.font = (weight || 800) + " " + size + "px " + (serif ? SERIF : FONT);
+    try { ctx.letterSpacing = (spacing || 0) + "px"; } catch (e) { /* เบราว์เซอร์เก่า */ }
     const g = ctx.createLinearGradient(0, y - size, 0, y);
     g.addColorStop(0, "#fff3cf"); g.addColorStop(0.5, "#f0c95e"); g.addColorStop(1, "#9c7418");
     ctx.fillStyle = g;
     ctx.shadowColor = "rgba(230,184,76,.5)"; ctx.shadowBlur = 45;
     ctx.fillText(text, x, y);
     ctx.shadowBlur = 0; ctx.shadowColor = "transparent";
+    try { ctx.letterSpacing = "0px"; } catch (e) { /* noop */ }
   }
 
-  // ไพ่ทาโรต์ใบเล็กสไตล์วินเทจ: พื้นครีม กรอบทอง เลขโรมัน + สัญลักษณ์ + ชื่อ
+  // ---------- ไอคอนไพ่ลายเส้นทอง (วาดเวกเตอร์เอง ไม่ใช้อิโมจิ) ----------
+  const CARD_GOLD = "#d9b258";
+  const CARD_ICONS = {
+    sun(ctx) {
+      ctx.beginPath(); ctx.arc(0, 0, 40, 0, Math.PI * 2); ctx.stroke();
+      ctx.beginPath(); ctx.arc(0, 0, 14, 0, Math.PI * 2); ctx.stroke();
+      for (let i = 0; i < 12; i++) {
+        const a = i * Math.PI / 6;
+        ctx.beginPath(); ctx.moveTo(Math.cos(a) * 52, Math.sin(a) * 52);
+        ctx.lineTo(Math.cos(a) * (i % 2 ? 66 : 80), Math.sin(a) * (i % 2 ? 66 : 80)); ctx.stroke();
+      }
+    },
+    wheel(ctx) {
+      ctx.beginPath(); ctx.arc(0, 0, 64, 0, Math.PI * 2); ctx.stroke();
+      ctx.beginPath(); ctx.arc(0, 0, 47, 0, Math.PI * 2); ctx.stroke();
+      for (let i = 0; i < 8; i++) {
+        const a = i * Math.PI / 4;
+        ctx.beginPath(); ctx.moveTo(Math.cos(a) * 10, Math.sin(a) * 10);
+        ctx.lineTo(Math.cos(a) * 47, Math.sin(a) * 47); ctx.stroke();
+      }
+      ctx.beginPath(); ctx.arc(0, 0, 10, 0, Math.PI * 2); ctx.stroke();
+    },
+    empress(ctx) { // สัญลักษณ์วีนัส + มงกุฎสามยอด
+      ctx.beginPath(); ctx.arc(0, -14, 32, 0, Math.PI * 2); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(0, 18); ctx.lineTo(0, 66); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(-20, 44); ctx.lineTo(20, 44); ctx.stroke();
+      [-26, 0, 26].forEach((x, i) => {
+        ctx.beginPath(); ctx.arc(x, i === 1 ? -72 : -60, 5, 0, Math.PI * 2); ctx.fill();
+      });
+    },
+    lovers(ctx) { // แหวนสองวงคล้องกัน + หัวใจ
+      ctx.beginPath(); ctx.arc(-19, 14, 30, 0, Math.PI * 2); ctx.stroke();
+      ctx.beginPath(); ctx.arc(19, 14, 30, 0, Math.PI * 2); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(0, -26);
+      ctx.bezierCurveTo(-20, -46, -44, -22, 0, 4);
+      ctx.bezierCurveTo(44, -22, 20, -46, 0, -26);
+      ctx.stroke();
+    },
+    star(ctx) {
+      function s4(s, rot, fill) {
+        ctx.save(); ctx.rotate(rot); ctx.beginPath();
+        ctx.moveTo(0, -s); ctx.lineTo(s * .22, -s * .22); ctx.lineTo(s, 0); ctx.lineTo(s * .22, s * .22);
+        ctx.lineTo(0, s); ctx.lineTo(-s * .22, s * .22); ctx.lineTo(-s, 0); ctx.lineTo(-s * .22, -s * .22);
+        ctx.closePath(); fill ? ctx.fill() : ctx.stroke(); ctx.restore();
+      }
+      s4(74, 0); s4(48, Math.PI / 4);
+      [[-60, -52], [64, 44]].forEach(([x, y]) => {
+        ctx.save(); ctx.translate(x, y); s4(13, 0, true); ctx.restore();
+      });
+    },
+    world(ctx) { // ลูกโลกในช่อลอเรล
+      ctx.beginPath(); ctx.arc(0, 0, 38, 0, Math.PI * 2); ctx.stroke();
+      ctx.beginPath(); ctx.ellipse(0, 0, 38, 15, 0, 0, Math.PI * 2); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(0, -38); ctx.lineTo(0, 38); ctx.stroke();
+      [-1, 1].forEach(sg => {
+        ctx.beginPath(); ctx.moveTo(sg * 58, 60);
+        ctx.quadraticCurveTo(sg * 80, 0, sg * 52, -54); ctx.stroke();
+        for (let i = 0; i < 5; i++) {
+          const t = 48 - i * 24;
+          ctx.beginPath(); ctx.moveTo(sg * (72 - i * 3), t);
+          ctx.lineTo(sg * (52 - i * 4), t - 16); ctx.stroke();
+        }
+      });
+    },
+    emperor(ctx) { // มงกุฎ + ลูกโลกคทา
+      ctx.beginPath();
+      ctx.moveTo(-46, 0); ctx.lineTo(-46, -30); ctx.lineTo(-23, -8); ctx.lineTo(0, -44);
+      ctx.lineTo(23, -8); ctx.lineTo(46, -30); ctx.lineTo(46, 0); ctx.closePath(); ctx.stroke();
+      ctx.strokeRect(-46, 8, 92, 13);
+      ctx.beginPath(); ctx.moveTo(0, 28); ctx.lineTo(0, 62); ctx.stroke();
+      ctx.beginPath(); ctx.arc(0, 72, 9, 0, Math.PI * 2); ctx.stroke();
+      [[-46, -38], [0, -52], [46, -38]].forEach(([x, y]) => {
+        ctx.beginPath(); ctx.arc(x, y, 4.5, 0, Math.PI * 2); ctx.fill();
+      });
+    },
+    magician(ctx) { // เครื่องหมายอนันต์ + ไม้กายสิทธิ์
+      [-24, 24].forEach(x => { ctx.beginPath(); ctx.arc(x, -22, 24, 0, Math.PI * 2); ctx.stroke(); });
+      ctx.beginPath(); ctx.moveTo(0, 12); ctx.lineTo(0, 70); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(-15, 26); ctx.lineTo(15, 26); ctx.stroke();
+    },
+    chariot(ctx) { // รถศึก: หลังคา + ตัวรถ + ล้อซี่
+      ctx.strokeRect(-44, -14, 88, 34);
+      ctx.beginPath(); ctx.moveTo(-44, -14); ctx.lineTo(0, -50); ctx.lineTo(44, -14); ctx.stroke();
+      ctx.beginPath(); ctx.arc(0, -62, 7, 0, Math.PI * 2); ctx.stroke();
+      [-28, 28].forEach(x => {
+        ctx.beginPath(); ctx.arc(x, 40, 17, 0, Math.PI * 2); ctx.stroke();
+        for (let i = 0; i < 4; i++) {
+          const a = i * Math.PI / 4;
+          ctx.beginPath(); ctx.moveTo(x - Math.cos(a) * 17, 40 - Math.sin(a) * 17);
+          ctx.lineTo(x + Math.cos(a) * 17, 40 + Math.sin(a) * 17); ctx.stroke();
+        }
+      });
+    }
+  };
+
+  // ไพ่ทาโรต์ใบเล็กสไตล์พรีเมียม: พื้นน้ำเงินราตรี กรอบทอง ไอคอนลายเส้นทอง ชื่อ serif
   function miniCard(ctx, cx, cy, rot, card) {
     const w = 260, h = 420;
     ctx.save(); ctx.translate(cx, cy); ctx.rotate(rot);
-    ctx.shadowColor = "rgba(0,0,0,.55)"; ctx.shadowBlur = 34; ctx.shadowOffsetY = 12;
+    ctx.shadowColor = "rgba(0,0,0,.6)"; ctx.shadowBlur = 36; ctx.shadowOffsetY = 14;
     roundRect(ctx, -w / 2, -h / 2, w, h, 18);
-    ctx.fillStyle = "#f8efd8"; ctx.fill();
+    const face = ctx.createLinearGradient(0, -h / 2, 0, h / 2);
+    face.addColorStop(0, "#241e52"); face.addColorStop(1, "#0e0b24");
+    ctx.fillStyle = face; ctx.fill();
     ctx.shadowColor = "transparent"; ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
-    ctx.strokeStyle = "#b98a2e"; ctx.lineWidth = 5;
-    roundRect(ctx, -w / 2 + 11, -h / 2 + 11, w - 22, h - 22, 12); ctx.stroke();
-    ctx.strokeStyle = "rgba(185,138,46,.45)"; ctx.lineWidth = 2;
-    roundRect(ctx, -w / 2 + 20, -h / 2 + 20, w - 40, h - 40, 8); ctx.stroke();
-    ctx.textAlign = "center"; ctx.fillStyle = "#7a5a14";
-    ctx.font = "700 36px " + FONT; ctx.fillText(card.r, 0, -h / 2 + 66);
-    ctx.font = "125px " + FONT; ctx.fillText(card.e, 0, 45);
-    let nameSize = 24; // ชื่อยาว (เช่น WHEEL OF FORTUNE) ย่อฟอนต์จนพอดีกรอบ
-    ctx.font = "600 " + nameSize + "px " + FONT;
-    while (ctx.measureText(card.n.toUpperCase()).width > w - 48 && nameSize > 13) {
-      nameSize -= 1; ctx.font = "600 " + nameSize + "px " + FONT;
+    ctx.strokeStyle = CARD_GOLD; ctx.lineWidth = 4;
+    roundRect(ctx, -w / 2 + 8, -h / 2 + 8, w - 16, h - 16, 13); ctx.stroke();
+    ctx.strokeStyle = "rgba(217,178,88,.5)"; ctx.lineWidth = 1.5;
+    roundRect(ctx, -w / 2 + 17, -h / 2 + 17, w - 34, h - 34, 9); ctx.stroke();
+    // ประกายดาวเล็กสี่มุมไพ่
+    ctx.fillStyle = CARD_GOLD;
+    [[-w / 2 + 34, -h / 2 + 38], [w / 2 - 34, -h / 2 + 38], [-w / 2 + 34, h / 2 - 34], [w / 2 - 34, h / 2 - 34]].forEach(([x, y]) => {
+      ctx.save(); ctx.translate(x, y); ctx.beginPath();
+      ctx.moveTo(0, -7); ctx.lineTo(2, -2); ctx.lineTo(7, 0); ctx.lineTo(2, 2);
+      ctx.lineTo(0, 7); ctx.lineTo(-2, 2); ctx.lineTo(-7, 0); ctx.lineTo(-2, -2);
+      ctx.closePath(); ctx.fill(); ctx.restore();
+    });
+    ctx.textAlign = "center"; ctx.fillStyle = CARD_GOLD;
+    ctx.font = "700 34px " + SERIF;
+    ctx.fillText(card.r, 0, -h / 2 + 68);
+    // ไอคอนลายเส้นทองกลางไพ่
+    ctx.save(); ctx.translate(0, 14);
+    ctx.strokeStyle = CARD_GOLD; ctx.lineWidth = 5;
+    ctx.lineJoin = "round"; ctx.lineCap = "round";
+    (CARD_ICONS[card.icon] || CARD_ICONS.star)(ctx);
+    ctx.restore();
+    let nameSize = 23; // ชื่อยาวย่อฟอนต์จนพอดีกรอบ
+    ctx.font = "600 " + nameSize + "px " + SERIF;
+    while (ctx.measureText(card.n.toUpperCase()).width > w - 52 && nameSize > 12) {
+      nameSize -= 1; ctx.font = "600 " + nameSize + "px " + SERIF;
     }
-    ctx.fillText(card.n.toUpperCase(), 0, h / 2 - 36);
+    ctx.fillText(card.n.toUpperCase(), 0, h / 2 - 40);
     ctx.restore();
   }
 
@@ -317,6 +431,29 @@ window.MEDIUM_CARD = (function () {
     glow.addColorStop(0, goal.accent + "33"); glow.addColorStop(1, "rgba(0,0,0,0)");
     ctx.fillStyle = glow; ctx.fillRect(0, 0, W, H);
 
+    // โบเก้ทองนุ่ม ๆ (ตำแหน่งจาก seed) + ขอบมืดวินเยตต์ ให้ภาพมีมิติ
+    let sb = (seed ^ 0x9e37) >>> 0 || 5;
+    const rndB = () => (sb = (sb * 1664525 + 1013904223) >>> 0) / 4294967296;
+    for (let i = 0; i < 7; i++) {
+      const bx = rndB() * W, by = rndB() * H * 0.72, br = 50 + rndB() * 95;
+      const bok = ctx.createRadialGradient(bx, by, 0, bx, by, br);
+      bok.addColorStop(0, goal.accent + "30"); bok.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = bok;
+      ctx.beginPath(); ctx.arc(bx, by, br, 0, Math.PI * 2); ctx.fill();
+    }
+    const vig = ctx.createRadialGradient(W / 2, H / 2, H * 0.28, W / 2, H / 2, H * 0.72);
+    vig.addColorStop(0, "rgba(0,0,0,0)"); vig.addColorStop(1, "rgba(0,0,0,.5)");
+    ctx.fillStyle = vig; ctx.fillRect(0, 0, W, H);
+
+    // กรอบทองรอบภาพ + มุมหนาแบบกรอบรูปพรีเมียม
+    ctx.strokeStyle = "rgba(217,178,88,.7)"; ctx.lineWidth = 3;
+    ctx.strokeRect(30, 30, W - 60, H - 60);
+    ctx.strokeStyle = CARD_GOLD; ctx.lineWidth = 7; ctx.lineCap = "square";
+    [[30, 30, 1, 1], [W - 30, 30, -1, 1], [30, H - 30, 1, -1], [W - 30, H - 30, -1, -1]].forEach(([x, y, dx, dy]) => {
+      ctx.beginPath(); ctx.moveTo(x + dx * 85, y); ctx.lineTo(x, y); ctx.lineTo(x, y + dy * 85); ctx.stroke();
+    });
+    ctx.lineCap = "butt";
+
     ctx.textAlign = "center";
 
     if (styleKey === "tarot" || styleKey === "deity") {
@@ -332,15 +469,15 @@ window.MEDIUM_CARD = (function () {
     }
 
     if (styleKey === "tarot") {
-      // สไตล์ยอดนิยม: คำอังกฤษตัวใหญ่ + ไพ่ 3 ใบซ้อน + เลข 3 หลัก
-      goldText(ctx, GOAL_EN[goalKey], W / 2, 350, 185);
+      // สไตล์ยอดนิยม: คำอังกฤษ serif ทองฟอยล์ + ไพ่ 3 ใบซ้อน + เลข 3 หลัก
+      goldText(ctx, GOAL_EN[goalKey], W / 2, 345, 168, 700, true, 16);
       ctx.fillStyle = "#fff"; ctx.font = "600 46px " + FONT;
       ctx.fillText(goal.label, W / 2, 435);
       const cards = GOAL_CARDS[goalKey];
       miniCard(ctx, W / 2 - 265, 850, -0.16, cards[0]);
       miniCard(ctx, W / 2 + 265, 850, 0.16, cards[2]);
       miniCard(ctx, W / 2, 805, 0, cards[1]);
-      goldText(ctx, String(luckyNum3), W / 2, 1450, 250);
+      goldText(ctx, String(luckyNum3), W / 2, 1450, 240, 700, true, 10);
       ctx.fillStyle = goal.accent; ctx.font = "600 38px " + FONT;
       ctx.fillText("เลขนำโชคประจำดวงคุณ", W / 2, 1530);
       ctx.fillStyle = "#fff"; ctx.font = "500 38px " + FONT;
@@ -359,17 +496,20 @@ window.MEDIUM_CARD = (function () {
       }
       ctx.font = "230px " + FONT;
       ctx.fillText(d.e, W / 2, cy + 80);
-      ctx.fillStyle = goal.accent; // จุดไข่มุกฐานบัวใต้ซุ้ม
-      for (let i = 0; i < 9; i++) {
-        const a = Math.PI * (0.2 + i * 0.075);
-        ctx.beginPath();
-        ctx.arc(W / 2 + Math.cos(a) * 300, cy + 120 + Math.sin(a) * 80, i === 4 ? 8 : 5, 0, Math.PI * 2);
-        ctx.fill();
+      // ฐานกลีบบัวไล่เฉดรองรับซุ้ม
+      for (let i = -3; i <= 3; i++) {
+        ctx.save(); ctx.translate(W / 2 + i * 58, cy + 322); ctx.rotate(i * 0.17);
+        ctx.beginPath(); ctx.moveTo(0, 0);
+        ctx.quadraticCurveTo(27, -42, 0, -80);
+        ctx.quadraticCurveTo(-27, -42, 0, 0); ctx.closePath();
+        const pg = ctx.createLinearGradient(0, -80, 0, 0);
+        pg.addColorStop(0, goal.accent + "d0"); pg.addColorStop(1, goal.accent + "28");
+        ctx.fillStyle = pg; ctx.fill(); ctx.restore();
       }
       goldText(ctx, d.name, W / 2, 1030, 108);
       ctx.fillStyle = "#fff"; ctx.font = "500 42px " + FONT;
       wrap(ctx, d.wish, W - 240).forEach((l, i) => ctx.fillText(l, W / 2, 1120 + i * 62));
-      goldText(ctx, String(luckyNum3), W / 2, 1480, 230);
+      goldText(ctx, String(luckyNum3), W / 2, 1480, 220, 700, true, 10);
       ctx.fillStyle = goal.accent; ctx.font = "600 38px " + FONT;
       ctx.fillText("เลขนำโชคประจำดวงคุณ · " + goal.label, W / 2, 1560);
     } else {
