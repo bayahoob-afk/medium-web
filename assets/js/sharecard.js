@@ -130,14 +130,118 @@ window.MEDIUM_CARD = (function () {
     return c;
   }
 
+  // ---------- ลายมงคล 4 สไตล์ (วาดช่วงบนของวอลเปเปอร์ y≈200-660) ----------
+  const WALL_STYLES = {
+    unalome: "🌀 อุณาโลมมินิมอล",
+    yantra: "🔯 เรขาคณิตมงคล",
+    moon: "🌙 จันทร์เสี้ยวกลุ่มดาว",
+    lotus: "🪷 บัวทองผลิบาน"
+  };
+
+  const MOTIFS = {
+    // เกลียวอุณาโลมอย่างเรียบ (ลายดั้งเดิม)
+    unalome(ctx, W, accent, seed) {
+      ctx.strokeStyle = accent; ctx.fillStyle = accent; ctx.lineWidth = 5;
+      ctx.beginPath(); ctx.arc(W / 2, 300, 10, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath();
+      for (let a = 0; a <= Math.PI * 3.5; a += 0.05) {
+        const r = 14 + a * 11;
+        const x = W / 2 + Math.cos(a - Math.PI / 2) * r;
+        const y = 390 + Math.sin(a - Math.PI / 2) * r * 0.8;
+        a === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(W / 2, 490); ctx.lineTo(W / 2, 640); ctx.stroke();
+    },
+    // เรขาคณิตมงคล: วงซ้อน + สี่เหลี่ยมหมุน + รัศมี + เก้าจุด (ลายเชิงสัญลักษณ์ทั่วไป ไม่อ้างอิงยันต์จริง)
+    yantra(ctx, W, accent, seed) {
+      const cx = W / 2, cy = 420, rot = (seed % 90) * Math.PI / 720; // เอียงเล็กน้อยตามดวงแต่ละคน
+      ctx.save(); ctx.translate(cx, cy); ctx.rotate(rot);
+      ctx.strokeStyle = accent; ctx.fillStyle = accent;
+      [70, 112, 154].forEach((r, i) => {
+        ctx.lineWidth = i === 2 ? 5 : 2.5;
+        ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2); ctx.stroke();
+      });
+      ctx.lineWidth = 3;
+      ctx.save(); ctx.rotate(Math.PI / 4);
+      ctx.strokeRect(-112 / Math.SQRT2 - 33, -112 / Math.SQRT2 - 33, 224 / Math.SQRT2 + 66, 224 / Math.SQRT2 + 66);
+      ctx.restore();
+      for (let i = 0; i < 12; i++) { // รัศมี 12 ทิศ
+        const a = i * Math.PI / 6;
+        ctx.beginPath();
+        ctx.moveTo(Math.cos(a) * 162, Math.sin(a) * 162);
+        ctx.lineTo(Math.cos(a) * (i % 3 === 0 ? 205 : 185), Math.sin(a) * (i % 3 === 0 ? 205 : 185));
+        ctx.stroke();
+      }
+      for (let gy = -1; gy <= 1; gy++) for (let gx = -1; gx <= 1; gx++) { // เก้าจุดมงคลกลางวง
+        ctx.beginPath(); ctx.arc(gx * 34, gy * 34, gx === 0 && gy === 0 ? 9 : 5, 0, Math.PI * 2); ctx.fill();
+      }
+      ctx.restore();
+    },
+    // จันทร์เสี้ยว + วงโคจร + กลุ่มดาวลากเส้นตามดวง
+    moon(ctx, W, accent, seed, bg) {
+      const cx = W / 2, cy = 400;
+      ctx.fillStyle = accent;
+      ctx.beginPath(); ctx.arc(cx, cy, 125, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = bg; // เจาะเป็นเสี้ยวด้วยสีพื้นเดิม (ไม่ทะลุเป็นรูโปร่งใส)
+      ctx.beginPath(); ctx.arc(cx + 52, cy - 28, 118, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = accent; ctx.lineWidth = 2.5;
+      [165, 195].forEach(r => { // วงโคจรรอบจันทร์
+        ctx.beginPath(); ctx.arc(cx, cy, r, Math.PI * 0.75, Math.PI * 2.15); ctx.stroke();
+      });
+      // กลุ่มดาวประจำดวง: 6 จุดตำแหน่งจาก seed ลากเส้นต่อกัน
+      let s = seed >>> 0 || 9;
+      const rnd = () => (s = (s * 1664525 + 1013904223) >>> 0) / 4294967296;
+      const pts = Array.from({ length: 6 }, (_, i) => ({
+        x: 140 + rnd() * (W - 280), y: 180 + rnd() * 430
+      }));
+      ctx.lineWidth = 2; ctx.strokeStyle = accent + "88";
+      ctx.beginPath();
+      pts.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+      ctx.stroke();
+      ctx.fillStyle = accent;
+      pts.forEach(p => { ctx.beginPath(); ctx.arc(p.x, p.y, 6, 0, Math.PI * 2); ctx.fill(); });
+    },
+    // ดอกบัวผลิบาน: กลีบ 3 ชั้น + รัศมีธรรม + จุดไข่มุก
+    lotus(ctx, W, accent, seed) {
+      const cx = W / 2, cy = 560;
+      function petal(w, h, rot) {
+        ctx.save(); ctx.translate(cx, cy); ctx.rotate(rot);
+        ctx.beginPath(); ctx.moveTo(0, 0);
+        ctx.quadraticCurveTo(w / 2, -h * 0.72, 0, -h);
+        ctx.quadraticCurveTo(-w / 2, -h * 0.72, 0, 0);
+        ctx.stroke(); ctx.restore();
+      }
+      ctx.strokeStyle = accent; ctx.fillStyle = accent;
+      ctx.lineWidth = 3.5;
+      [-0.9, -0.45, 0, 0.45, 0.9].forEach(r => petal(120, 300, r)); // กลีบนอก
+      ctx.lineWidth = 5;
+      [-0.4, 0, 0.4].forEach(r => petal(105, 230, r)); // กลีบใน
+      ctx.lineWidth = 2.5;
+      for (let i = 0; i < 7; i++) { // รัศมีเหนือดอก
+        const a = Math.PI + (i / 6) * Math.PI;
+        const x1 = cx + Math.cos(a) * 210, y1 = cy - 150 + Math.sin(a) * 190;
+        const x2 = cx + Math.cos(a) * 260, y2 = cy - 150 + Math.sin(a) * 240;
+        ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+      }
+      for (let i = 0; i < 9; i++) { // จุดไข่มุกโค้งใต้ดอก
+        const a = Math.PI * (0.15 + i * 0.0875);
+        ctx.beginPath();
+        ctx.arc(cx + Math.cos(a) * 190, cy + 30 + Math.sin(a) * 60, i === 4 ? 7 : 4.5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+  };
+
   // ---------- วอลเปเปอร์เสริมดวง 1080×2340 (จอมือถือ) ----------
   function drawWallpaper(opts) {
     const W = 1080, H = 2340;
     const goal = GOALS[opts.goal] || GOALS.money;
+    const styleKey = MOTIFS[opts.style] ? opts.style : "unalome";
     const dob = opts.dob || null;
     const dayIdx = dob ? new Date(dob).getDay() : new Date().getDay();
     const day = DAY_META[dayIdx] || DAY_META[0];
-    const seedStr = (dob || "guest") + "|" + opts.goal;
+    const seedStr = (dob || "guest") + "|" + opts.goal + "|" + styleKey;
     let seed = 5381;
     for (let i = 0; i < seedStr.length; i++) seed = ((seed << 5) + seed + seedStr.charCodeAt(i)) >>> 0;
     const luckyNum = (seed % 9) + 1;
@@ -156,18 +260,8 @@ window.MEDIUM_CARD = (function () {
     glow.addColorStop(0, goal.accent + "33"); glow.addColorStop(1, "rgba(0,0,0,0)");
     ctx.fillStyle = glow; ctx.fillRect(0, 0, W, H);
 
-    // ลายมงคลตอนบน: จุด-เกลียว-เส้นตรง (แนวอุณาโลมอย่างเรียบ)
-    ctx.strokeStyle = goal.accent; ctx.fillStyle = goal.accent; ctx.lineWidth = 5;
-    ctx.beginPath(); ctx.arc(W / 2, 300, 10, 0, Math.PI * 2); ctx.fill();
-    ctx.beginPath();
-    for (let a = 0; a <= Math.PI * 3.5; a += 0.05) {
-      const r = 14 + a * 11;
-      const x = W / 2 + Math.cos(a - Math.PI / 2) * r;
-      const y = 300 + 90 + Math.sin(a - Math.PI / 2) * r * 0.8;
-      a === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-    }
-    ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(W / 2, 490); ctx.lineTo(W / 2, 640); ctx.stroke();
+    // ลายมงคลตอนบนตามสไตล์ที่เลือก
+    MOTIFS[styleKey](ctx, W, goal.accent, seed, goal.g1);
 
     ctx.textAlign = "center";
     ctx.font = "150px " + FONT;
@@ -229,5 +323,5 @@ window.MEDIUM_CARD = (function () {
     return "downloaded";
   }
 
-  return { GOALS, drawReadingCard, drawWallpaper, share, download };
+  return { GOALS, WALL_STYLES, drawReadingCard, drawWallpaper, share, download };
 })();

@@ -27,7 +27,18 @@
 
     <div class="wp-layout">
       <div class="card">
-        <h3 style="margin-top:0">1) เลือกด้านที่อยากเสริม</h3>
+        <h3 style="margin-top:0">1) วันเกิดของคุณ (ไม่บังคับ)</h3>
+        <p class="muted" style="font-size:.85rem;margin:0 0 8px">
+          ใช้คำนวณสีมงคล เลขนำโชค และคำแนะนำเฉพาะคุณ — เก็บในเครื่องคุณเท่านั้น ไม่ส่งไปที่ใด</p>
+        <div class="tool-row" style="display:flex;gap:8px;flex-wrap:wrap">
+          <input type="date" id="wp-dob" style="flex:1;min-width:150px;background:rgba(0,0,0,.3);color:inherit;border:1px solid var(--line);border-radius:10px;padding:8px 12px;font:inherit">
+        </div>
+        <p id="wp-rec" hidden style="font-size:.85rem;margin:10px 0 0;padding:10px 12px;border:1px dashed var(--gold);border-radius:10px">
+          <span id="wp-rec-text"></span>
+          <button class="btn btn-gold btn-sm" id="wp-rec-use" style="margin-left:8px;padding:4px 14px">ใช้ตามตำรา</button>
+        </p>
+
+        <h3>2) เลือกด้านที่อยากเสริม</h3>
         <div id="goal-chips" style="display:flex;gap:8px;flex-wrap:wrap">
           <button class="chip goal-chip active" data-goal="money">💰 การเงิน</button>
           <button class="chip goal-chip" data-goal="love">💗 ความรัก</button>
@@ -35,12 +46,8 @@
           <button class="chip goal-chip" data-goal="work">💼 การงาน</button>
         </div>
 
-        <h3>2) วันเกิด (ไม่บังคับ)</h3>
-        <p class="muted" style="font-size:.85rem;margin:0 0 8px">
-          ใช้คำนวณสีมงคลและเลขนำโชคเฉพาะคุณ — เก็บในเครื่องคุณเท่านั้น ไม่ส่งไปที่ใด</p>
-        <div class="tool-row" style="display:flex;gap:8px;flex-wrap:wrap">
-          <input type="date" id="wp-dob" style="flex:1;min-width:150px;background:rgba(0,0,0,.3);color:inherit;border:1px solid var(--line);border-radius:10px;padding:8px 12px;font:inherit">
-        </div>
+        <h3>3) เลือกลายมงคล</h3>
+        <div id="style-chips" style="display:flex;gap:8px;flex-wrap:wrap"></div>
 
         <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:18px">
           <button class="btn btn-gold" id="wp-download">⬇️ ดาวน์โหลดฟรี</button>
@@ -64,41 +71,82 @@
   <script src="assets/js/daily.js"></script>
   <script src="assets/js/sharecard.js"></script>
   <script>
-    let goal = "money";
+    let goal = "money", wallStyle = "unalome", manualGoal = false;
     const dobInput = document.getElementById("wp-dob");
     const preview = document.getElementById("wp-canvas");
+
+    // ตำราแนะนำด้านที่ควรเสริมตามดาวประจำวันเกิด (โหราไทย)
+    const REC_BY_DAY = [
+      { goal: "work", why: "คนเกิดวันอาทิตย์ดาวเด่นเรื่องอำนาจบารมี ตำราแนะเสริมการงานให้สุดทาง" },
+      { goal: "love", why: "คนเกิดวันจันทร์เสน่ห์นุ่มนวลเป็นทุนเดิม ตำราแนะเสริมความรักเมตตามหานิยม" },
+      { goal: "luck", why: "คนเกิดวันอังคารใจกล้าลุยชน ตำราแนะเสริมโชคลาภแคล้วคลาดกันเรื่องปะทะ" },
+      { goal: "money", why: "คนเกิดวันพุธค้าขายเจรจาเก่ง ตำราแนะเสริมการเงินให้ทรัพย์ไหลลื่น" },
+      { goal: "work", why: "คนเกิดวันพฤหัสมีผู้ใหญ่อุปถัมภ์ ตำราแนะเสริมการงานบารมียิ่งรุ่ง" },
+      { goal: "money", why: "คนเกิดวันศุกร์ดาวศุกร์เด่นโภคทรัพย์ ตำราแนะเสริมการเงินมั่งคั่ง" },
+      { goal: "luck", why: "คนเกิดวันเสาร์ชีวิตฝ่าฟันเก่ง ตำราแนะเสริมโชคลาภแคล้วคลาดให้ทางเรียบขึ้น" }
+    ];
+    const GOAL_TH = { money: "💰 การเงิน", love: "💗 ความรัก", luck: "🍀 โชคลาภ", work: "💼 การงาน" };
 
     // ถ้ามีโปรไฟล์ดวงจากหน้าแรกอยู่แล้ว เติมวันเกิดให้อัตโนมัติ
     const profile = window.MEDIUM_DAILY.getProfile();
     if (profile && profile.dob) dobInput.value = profile.dob;
 
+    // ชิปลายมงคล 4 สไตล์จาก MEDIUM_CARD
+    const styleChips = document.getElementById("style-chips");
+    styleChips.innerHTML = Object.entries(MEDIUM_CARD.WALL_STYLES).map(([k, label]) =>
+      `<button class="chip style-chip ${k === wallStyle ? "active" : ""}" data-style="${k}">${label}</button>`).join("");
+
     function makeCanvas() {
-      return MEDIUM_CARD.drawWallpaper({ goal, dob: dobInput.value || null });
+      return MEDIUM_CARD.drawWallpaper({ goal, style: wallStyle, dob: dobInput.value || null });
     }
     function renderPreview() {
       const src = makeCanvas();
       preview.width = src.width; preview.height = src.height;
       preview.getContext("2d").drawImage(src, 0, 0);
     }
+    function setGoal(g) {
+      goal = g;
+      document.querySelectorAll(".goal-chip").forEach(c => c.classList.toggle("active", c.dataset.goal === g));
+      renderPreview();
+    }
+    function updateRec(autoApply) {
+      const box = document.getElementById("wp-rec");
+      if (!dobInput.value) { box.hidden = true; return; }
+      const rec = REC_BY_DAY[new Date(dobInput.value + "T12:00:00").getDay()];
+      document.getElementById("wp-rec-text").innerHTML =
+        `✨ ${rec.why} → <b class="gold">${GOAL_TH[rec.goal]}</b>`;
+      box.hidden = false;
+      document.getElementById("wp-rec-use").onclick = () => { manualGoal = false; setGoal(rec.goal); };
+      // เปลี่ยนให้อัตโนมัติเฉพาะตอนที่ผู้ใช้ยังไม่ได้เลือกเองในรอบนี้
+      if (autoApply && !manualGoal) setGoal(rec.goal);
+    }
 
     document.getElementById("goal-chips").addEventListener("click", e => {
       const chip = e.target.closest(".goal-chip");
       if (!chip) return;
-      goal = chip.dataset.goal;
-      document.querySelectorAll(".goal-chip").forEach(c => c.classList.toggle("active", c === chip));
+      manualGoal = true;
+      setGoal(chip.dataset.goal);
+    });
+    styleChips.addEventListener("click", e => {
+      const chip = e.target.closest(".style-chip");
+      if (!chip) return;
+      wallStyle = chip.dataset.style;
+      styleChips.querySelectorAll(".chip").forEach(c => c.classList.toggle("active", c === chip));
       renderPreview();
     });
     dobInput.addEventListener("change", () => {
       if (dobInput.value) window.MEDIUM_DAILY.saveProfile({ ...(profile || {}), dob: dobInput.value });
+      updateRec(true);
       renderPreview();
     });
 
     document.getElementById("wp-download").onclick = () =>
-      MEDIUM_CARD.download(makeCanvas(), "medium-wallpaper-" + goal + ".png");
+      MEDIUM_CARD.download(makeCanvas(), "medium-wallpaper-" + goal + "-" + wallStyle + ".png");
     document.getElementById("wp-share").onclick = () =>
-      MEDIUM_CARD.share(makeCanvas(), "medium-wallpaper-" + goal + ".png",
+      MEDIUM_CARD.share(makeCanvas(), "medium-wallpaper-" + goal + "-" + wallStyle + ".png",
         "🔮 วอลเปเปอร์เสริมดวงของฉันจาก Medium — สร้างของคุณเองฟรีที่ " + location.href);
 
+    updateRec(true);
     renderPreview();
   </script>
 </body>
