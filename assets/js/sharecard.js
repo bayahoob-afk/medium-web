@@ -284,6 +284,17 @@ window.MEDIUM_CARD = (function () {
     const w = 260, h = 420;
     ctx.save(); ctx.translate(cx, cy); ctx.rotate(rot);
     if (scale) ctx.scale(scale, scale);
+    // ถ้าโหลดสำรับ Medium Arcana ไว้ ใช้ภาพไพ่วาดเองเต็มใบ (สำรับเดียวกับหน้าหมอดูทิพย์)
+    const own = window.MEDIUM_DECK && window.MEDIUM_DECK.byName[card.n];
+    if (own) {
+      ctx.shadowColor = "rgba(0,0,0,.6)"; ctx.shadowBlur = 36; ctx.shadowOffsetY = 14;
+      roundRect(ctx, -w / 2, -h / 2, w, h, 18);
+      ctx.fillStyle = "#0e0b24"; ctx.fill();
+      ctx.shadowColor = "transparent"; ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
+      window.MEDIUM_DECK.draw(ctx, own.key, -w / 2, -h / 2, w, h);
+      ctx.restore();
+      return;
+    }
     ctx.shadowColor = "rgba(0,0,0,.6)"; ctx.shadowBlur = 36; ctx.shadowOffsetY = 14;
     roundRect(ctx, -w / 2, -h / 2, w, h, 18);
     const face = ctx.createLinearGradient(0, -h / 2, 0, h / 2);

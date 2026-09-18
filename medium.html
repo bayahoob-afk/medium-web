@@ -78,6 +78,7 @@
   <script src="data/personas.js"></script>
   <script src="assets/js/app.js"></script>
   <script src="assets/js/journal.js"></script>
+  <script src="assets/js/tarot-deck.js"></script>
   <script src="assets/js/sharecard.js"></script>
   <script>
     const personas = window.MEDIUM_PERSONAS || [];
@@ -281,11 +282,22 @@
           const b = e.target.closest(".tcard");
           if (!b || b.classList.contains("flip") || pickedCards.length >= 3) return;
           const card = shuffled[+b.dataset.i];
-          b.querySelector(".tc-reveal").innerHTML = `
-            <span class="tr-num">${card.r || "✧"}</span>
-            <span class="tr-emoji">${card.e || "🎴"}</span>
-            <span class="tr-name">${card.n}</span>
-            <span class="tr-pos">${POS_TAG[pickedCards.length]}</span>`;
+          const reveal = b.querySelector(".tc-reveal");
+          // สำรับ Medium Arcana: ไพ่ทาโรต์วาดเองของเว็บ (ลายเส้นทองบนน้ำเงินราตรี)
+          const own = id === "tarot" && window.MEDIUM_DECK && MEDIUM_DECK.byName[card.n];
+          if (own) {
+            reveal.innerHTML = `<canvas class="tr-art"></canvas>
+              <span class="tr-pos tr-pos-float">${POS_TAG[pickedCards.length]}</span>`;
+            const box = b.getBoundingClientRect();
+            MEDIUM_DECK.renderTo(reveal.querySelector(".tr-art"), own.key,
+              Math.max(60, Math.round(box.width)), Math.max(90, Math.round(box.height)));
+          } else {
+            reveal.innerHTML = `
+              <span class="tr-num">${card.r || "✧"}</span>
+              <span class="tr-emoji">${card.e || "🎴"}</span>
+              <span class="tr-name">${card.n}</span>
+              <span class="tr-pos">${POS_TAG[pickedCards.length]}</span>`;
+          }
           b.classList.add("flip");
           pickedCards.push(card);
           toolBox.querySelector("#pick-status").textContent = `เลือกแล้ว ${pickedCards.length}/3 ใบ`;

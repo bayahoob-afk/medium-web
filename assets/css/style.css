@@ -560,6 +560,17 @@ button { font-family: inherit; cursor: pointer; }
   background: rgba(139,92,246,.3); border: 1px solid rgba(139,92,246,.55);
   color: #d9c8ff; white-space: nowrap;
 }
+/* สำรับ Medium Arcana: อาร์ตเต็มหน้าไพ่ + ป้ายตำแหน่งลอยด้านล่าง */
+.tc-reveal .tr-art {
+  position: absolute; inset: 0;
+  width: 100% !important; height: 100% !important;
+  border-radius: 12px;
+}
+.tr-pos-float {
+  position: absolute; bottom: 5px; left: 50%;
+  transform: translateX(-50%); z-index: 2;
+  background: rgba(30,16,58,.82); backdrop-filter: blur(2px);
+}
 
 /* ---------- สมุดคำทำนาย ---------- */
 .journal-item {
