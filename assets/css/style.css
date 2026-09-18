@@ -630,3 +630,11 @@ button { font-family: inherit; cursor: pointer; }
   font-size: .7rem; font-weight: 700; border-radius: 4px;
   margin: 30px 22px;
 }
+
+/* ---------- ให้ดาวรีวิว (การจองของฉัน) ---------- */
+.star-pick { display: flex; gap: 4px; }
+.star-btn {
+  background: transparent; border: 0; font-size: 1.5rem; line-height: 1;
+  color: var(--gold, #e6b84c); padding: 2px; transition: transform .15s;
+}
+.star-btn:hover { transform: scale(1.2); }

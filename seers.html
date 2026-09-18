@@ -343,9 +343,14 @@
           tool: currentTool, files: currentFiles.map(f => f.name)
         }));
       } catch (e) { /* private mode: ไปต่อได้ หน้าเซสชันมีค่า default */ }
-      // ประวัติการจองข้าม session (สำหรับ badge "เคยจอง" และการจองซ้ำ)
-      lsSet("medium_bookings", [{ seerId: currentSeer.id, date, time, at: new Date().toISOString() },
-        ...lsArr("medium_bookings")].slice(0, 20));
+      // ประวัติการจองข้าม session (หน้า "การจองของฉัน" + badge "เคยจอง")
+      lsSet("medium_bookings", [{
+        id: Date.now(), seerId: currentSeer.id, seerName: currentSeer.name, seerEmoji: currentSeer.emoji,
+        craft: currentSeer.craft, date, time, minutes: currentPkg,
+        price: currentPkg * currentSeer.pricePerMin, topic, tool: currentTool,
+        files: currentFiles.map(f => f.name), pay: payLabel, status: "upcoming",
+        at: new Date().toISOString()
+      }, ...lsArr("medium_bookings")].slice(0, 20));
       body.innerHTML = `
         <div class="tc" style="padding:20px 0">
           <div style="font-size:3.4rem">✅</div>
@@ -358,6 +363,7 @@
             ชำระผ่าน ${payLabel || "ระบบเดโม"} — เงินของคุณพักไว้ในระบบอย่างปลอดภัยแล้ว
           </p>
           <a href="session.html" class="btn btn-purple mt-2">🎥 เข้าเซสชันเลย (เดโม)</a>
+          <a href="my-bookings.html" class="btn btn-ghost btn-sm mt-2" style="margin-right:6px">🗓️ ดูการจองของฉัน</a>
           <button class="btn btn-ghost btn-sm mt-2" id="bk-ics">📅 เพิ่มนัดลงปฏิทิน + เตือนก่อน 30 นาที</button>
           <p class="muted" style="font-size:.85rem;margin-top:14px">
             ระหว่างรอถึงเวลานัด —

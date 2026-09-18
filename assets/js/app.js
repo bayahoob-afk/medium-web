@@ -11,6 +11,7 @@
         <a href="medium.html" ${page === "medium" ? 'class="active"' : ""}>หมอดูทิพย์</a>
         <a href="wallpaper.html" ${page === "wallpaper" ? 'class="active"' : ""}>วอลเปเปอร์มงคล</a>
         <a href="match.html" ${page === "match" ? 'class="active"' : ""}>ดวงคู่</a>
+        <a href="my-bookings.html" ${page === "bookings" ? 'class="active"' : ""}>การจองของฉัน</a>
         <a href="session.html" ${page === "session" ? 'class="active"' : ""}>เดโมเซสชัน</a>
         <a href="dashboard.html" ${page === "dashboard" ? 'class="active"' : ""}>หลังบ้านหมอดู</a>
       </nav>
@@ -38,9 +39,9 @@
         </div>
         <div>
           <h4>แพลตฟอร์ม</h4>
-          <a href="#">สมัครเป็นหมอดู</a>
-          <a href="#">นโยบายความเป็นส่วนตัว</a>
-          <a href="#">เงื่อนไขการใช้งาน</a>
+          <a href="join-seer.html">สมัครเป็นหมอดู</a>
+          <a href="privacy.html">นโยบายความเป็นส่วนตัว</a>
+          <a href="terms.html">เงื่อนไขการใช้งาน</a>
         </div>
       </div>
       <div class="copyright">© 2026 Medium — แพลตฟอร์มหมอดูออนไลน์ · ทุกเซสชันมีคลิปและสรุปให้เสมอ</div>

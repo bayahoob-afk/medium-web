@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>นโยบายความเป็นส่วนตัว | Medium</title>
+  <meta name="description" content="นโยบายความเป็นส่วนตัวของแพลตฟอร์ม Medium — ข้อมูลที่เก็บ วัตถุประสงค์ สิทธิของเจ้าของข้อมูลตาม PDPA และวิธีลบข้อมูลทั้งหมด">
+  <link rel="canonical" href="https://bayahoob-afk.github.io/medium-web/privacy.html">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔮</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#12081f">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-page="privacy">
+  <header class="nav" id="app-nav"></header>
+
+  <section class="section container" style="max-width:760px">
+    <div class="section-head">
+      <h2>🔐 นโยบาย<span class="em">ความเป็นส่วนตัว</span></h2>
+      <p>ปรับปรุงล่าสุด: 18 กันยายน 2569 · จัดทำตามแนว พ.ร.บ.คุ้มครองข้อมูลส่วนบุคคล (PDPA)</p>
+    </div>
+
+    <div class="card" style="line-height:1.9">
+      <h3>1. เวอร์ชันเดโมนี้เก็บข้อมูลไว้ที่ไหน</h3>
+      <p class="muted">เว็บไซต์นี้เป็นเวอร์ชันสาธิต ข้อมูลทุกอย่างที่คุณกรอก — โปรไฟล์ดวง วันเกิด การจอง
+        หมอดูคนโปรด รีวิว สมุดคำทำนาย และใบสมัครหมอดู — <b>ถูกเก็บใน localStorage
+        บนเบราว์เซอร์ของคุณเท่านั้น ไม่ถูกส่งไปยังเซิร์ฟเวอร์ใด</b>
+        การสนทนากับหมอดูทิพย์เป็นระบบตอบอัตโนมัติที่ทำงานในเครื่องของคุณ</p>
+
+      <h3 class="mt-3">2. ข้อมูลที่ระบบจริงจะเก็บ (เมื่อเปิดให้บริการเต็มรูปแบบ)</h3>
+      <ul class="muted" style="padding-left:20px">
+        <li>ข้อมูลบัญชี: ชื่อ อีเมล/เบอร์โทร — ใช้ยืนยันตัวตนและติดต่อ</li>
+        <li>ข้อมูลการจองและการชำระเงิน — ใช้ให้บริการและออกใบเสร็จ (ไม่เก็บเลขบัตรเต็ม)</li>
+        <li>วิดีโอเซสชัน — บันทึกเมื่อได้รับความยินยอมทั้งสองฝ่ายเท่านั้น เก็บ 90 วันเพื่อคุ้มครองข้อพิพาท</li>
+        <li>ไฟล์แนบถึงหมอดู (เช่น แปลนบ้าน รูปฝ่ามือ) — เปิดได้เฉพาะหมอดูที่คุณจอง ลบอัตโนมัติหลังจบเซสชัน 7 วัน</li>
+      </ul>
+
+      <h3 class="mt-3">3. สิทธิของคุณตาม PDPA</h3>
+      <p class="muted">คุณมีสิทธิขอเข้าถึง แก้ไข คัดค้านการประมวลผล ขอถ่ายโอน และขอลบข้อมูลส่วนบุคคลของคุณได้ตลอดเวลา
+        รวมถึงถอนความยินยอมที่เคยให้ไว้ โดยไม่กระทบบริการส่วนที่ไม่เกี่ยวข้อง</p>
+
+      <h3 class="mt-3">4. ลบข้อมูลทั้งหมดของคุณ (ทำได้ทันที)</h3>
+      <p class="muted">ปุ่มนี้ลบข้อมูลทุกอย่างที่เว็บนี้เก็บไว้ในเบราว์เซอร์ของคุณ —
+        โปรไฟล์ดวง การจอง คนโปรด รีวิว สมุดคำทำนาย และใบสมัคร — อย่างถาวร</p>
+      <button class="btn btn-danger btn-sm mt-1" id="wipe-btn">🗑️ ลบข้อมูลของฉันทั้งหมดในเครื่องนี้</button>
+      <p class="muted" id="wipe-done" hidden style="margin-top:8px">✅ ลบข้อมูลทั้งหมดแล้ว</p>
+
+      <h3 class="mt-3">5. ติดต่อเรื่องข้อมูลส่วนบุคคล</h3>
+      <p class="muted">ทีมงาน Medium (เดโม) — แจ้งผ่านช่องทางที่ได้รับลิงก์เว็บไซต์นี้</p>
+    </div>
+  </section>
+
+  <footer class="footer" id="app-footer"></footer>
+
+  <script src="assets/js/app.js"></script>
+  <script>
+    document.getElementById("wipe-btn").onclick = () => {
+      try {
+        Object.keys(localStorage).filter(k => k.startsWith("medium")).forEach(k => localStorage.removeItem(k));
+        sessionStorage.removeItem("mediumBooking");
+      } catch (e) { /* private mode: ไม่มีข้อมูลให้ลบอยู่แล้ว */ }
+      document.getElementById("wipe-done").hidden = false;
+    };
+  </script>
+</body>
+</html>

@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>สมัครเป็นหมอดูบน Medium — เปิดร้านดูดวงออนไลน์ รับงานผ่านวิดีโอคอล</title>
+  <meta name="description" content="สมัครเป็นหมอดูบนแพลตฟอร์ม Medium รับลูกค้าดูดวงผ่านวิดีโอคอล เงินเข้าระบบ escrow ปลอดภัย โอนทุกสัปดาห์ มีระบบจัดคิว อัดคลิป และสรุปคำทำนายให้อัตโนมัติ">
+  <link rel="canonical" href="https://bayahoob-afk.github.io/medium-web/join-seer.html">
+  <meta property="og:title" content="สมัครเป็นหมอดูบน Medium — เปิดร้านดูดวงออนไลน์">
+  <meta property="og:description" content="รับลูกค้าดูดวงผ่านวิดีโอคอล เงินปลอดภัยผ่าน escrow โอนทุกสัปดาห์">
+  <meta property="og:url" content="https://bayahoob-afk.github.io/medium-web/join-seer.html">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔮</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#12081f">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-page="join">
+  <header class="nav" id="app-nav"></header>
+
+  <section class="section container">
+    <div class="section-head">
+      <h2>เปิดร้านดูดวงของคุณบน <span class="em">Medium</span></h2>
+      <p>รับลูกค้าผ่านวิดีโอคอลจากทั่วประเทศ — เราจัดคิว เก็บเงิน อัดคลิป และส่งสรุปคำทำนายให้
+        คุณโฟกัสแค่การพยากรณ์</p>
+    </div>
+
+    <div class="grid grid-4 mb-4">
+      <div class="card tc"><span class="icon">💰</span><h3>รายได้ 80%</h3>
+        <p>ค่าบริการแพลตฟอร์ม 20% รวมทุกอย่าง — ระบบจอง วิดีโอคอล การตลาด และ escrow</p></div>
+      <div class="card tc"><span class="icon">🔒</span><h3>เงินปลอดภัย</h3>
+        <p>ลูกค้าจ่ายก่อนเข้า escrow โอนเข้าบัญชีคุณทุกศุกร์ พร้อมหนังสือรับรองหักภาษี 50 ทวิ</p></div>
+      <div class="card tc"><span class="icon">🗓️</span><h3>คุมเวลาเอง</h3>
+        <p>เปิด-ปิดรับคิวได้ทุกเมื่อ เลือกเครื่องมือพยากรณ์และราคา/นาทีของคุณเอง</p></div>
+      <div class="card tc"><span class="icon">📋</span><h3>ระบบช่วยครบ</h3>
+        <p>อัดคลิปอัตโนมัติ สรุปคำทำนายให้ลูกค้า ลดงานเอกสาร ป้องกันข้อพิพาท</p></div>
+    </div>
+
+    <div class="grid grid-4 mb-4">
+      <div class="card"><div class="step-num">1</div><h3>กรอกใบสมัคร</h3><p>แนะนำตัว ศาสตร์ที่เชี่ยวชาญ และประสบการณ์</p></div>
+      <div class="card"><div class="step-num">2</div><h3>ทดสอบพยากรณ์จริง</h3><p>สัมภาษณ์ + ดูดวงตัวอย่างกับทีมคัดกรอง ภายใน 7 วัน</p></div>
+      <div class="card"><div class="step-num">3</div><h3>ยืนยันตัวตน (KYC)</h3><p>บัตรประชาชน + บัญชีธนาคาร เพื่อความปลอดภัยของทุกฝ่าย</p></div>
+      <div class="card"><div class="step-num">4</div><h3>เปิดร้านรับคิว</h3><p>ตั้งราคา เลือกเครื่องมือ แล้วเริ่มรับลูกค้าได้เลย</p></div>
+    </div>
+
+    <div class="card" style="max-width:640px;margin:0 auto">
+      <h3 style="margin-bottom:14px">📝 ใบสมัครหมอดู</h3>
+      <form id="join-form">
+        <div class="form-group">
+          <label>ชื่อที่ใช้ดูดวง *</label>
+          <input required id="jf-name" placeholder="เช่น อ.ดาว พยากรณ์" style="width:100%;background:rgba(0,0,0,.3);color:inherit;border:1px solid var(--line);border-radius:10px;padding:10px 14px;font:inherit">
+        </div>
+        <div class="form-group">
+          <label>ศาสตร์/เครื่องมือที่เชี่ยวชาญ * (เลือกได้หลายอย่าง)</label>
+          <div class="tool-pick-row" id="jf-tools"></div>
+        </div>
+        <div class="form-group">
+          <label>ประสบการณ์ (ปี) *</label>
+          <input required id="jf-exp" type="number" min="1" max="60" placeholder="เช่น 5" style="width:100%;background:rgba(0,0,0,.3);color:inherit;border:1px solid var(--line);border-radius:10px;padding:10px 14px;font:inherit">
+        </div>
+        <div class="form-group">
+          <label>ช่องทางติดต่อกลับ (อีเมลหรือเบอร์โทร) *</label>
+          <input required id="jf-contact" placeholder="เช่น dow@example.com" style="width:100%;background:rgba(0,0,0,.3);color:inherit;border:1px solid var(--line);border-radius:10px;padding:10px 14px;font:inherit">
+        </div>
+        <div class="form-group">
+          <label>แนะนำตัวสั้น ๆ + ผลงาน/เพจ (ถ้ามี)</label>
+          <textarea id="jf-bio" rows="3" placeholder="เล่าแนวการดู จุดเด่น และช่องทางผลงานเดิม..." style="width:100%;background:rgba(0,0,0,.3);color:inherit;border:1px solid var(--line);border-radius:10px;padding:10px 14px;font:inherit"></textarea>
+        </div>
+        <label style="display:flex;gap:10px;font-size:.85rem;align-items:flex-start;margin-bottom:14px">
+          <input type="checkbox" required id="jf-agree" style="margin-top:4px">
+          <span>ฉันยอมรับ<a href="terms.html" class="gold">เงื่อนไขการใช้งาน</a>:
+            ค่าบริการแพลตฟอร์ม 20% + หักภาษี ณ ที่จ่าย 3%, ห้ามรับงาน/รับโอนนอกระบบ,
+            ทุกเซสชันบันทึกวิดีโอเมื่อได้รับความยินยอม และให้บริการเพื่อความบันเทิงตามกฎแพลตฟอร์ม</span>
+        </label>
+        <button class="btn btn-gold" style="width:100%" type="submit">🚀 ส่งใบสมัคร</button>
+        <p class="muted tc" style="font-size:.78rem;margin-top:10px">
+          เดโม — ใบสมัครบันทึกในเครื่องของคุณเท่านั้น ยังไม่ส่งไปที่ใด · ระบบจริงทีมงานติดต่อกลับภายใน 7 วัน</p>
+      </form>
+      <div id="join-done" class="tc" hidden style="padding:16px 0">
+        <div style="font-size:3rem">🎉</div>
+        <h3 class="mt-1">ส่งใบสมัครแล้ว!</h3>
+        <p class="muted" style="margin:10px 0">ทีมคัดกรองจะติดต่อกลับภายใน 7 วัน เพื่อนัดสัมภาษณ์และทดสอบพยากรณ์
+          <br>(เดโม — ข้อมูลอยู่ในเครื่องของคุณเท่านั้น)</p>
+        <a href="dashboard.html" class="btn btn-purple">👀 ดูตัวอย่างหลังบ้านหมอดู</a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer" id="app-footer"></footer>
+
+  <script src="assets/js/app.js"></script>
+  <script>
+    const JOIN_TOOLS = ["🃏 ไพ่ยิปซี", "🎴 ไพ่ออราเคิล", "🎲 ลูกเต๋าพยากรณ์", "📜 โหราศาสตร์ไทย",
+      "🔢 เลขศาสตร์", "🖐️ ลายมือ", "👤 โหงวเฮ้ง", "🪐 โหรายูเรเนียน", "👁️ จิตสัมผัส",
+      "🧭 ฮวงจุ้ย", "🐉 ปาจื่อ/ดวงจีน", "🌸 ซาจูเกาหลี", "🛕 โหราเขมร", "🕯️ อ่านพลังงาน"];
+    const box = document.getElementById("jf-tools");
+    box.innerHTML = JOIN_TOOLS.map(t => `<button type="button" class="chip tool-pick" data-tool="${t}">${t}</button>`).join("");
+    box.querySelectorAll(".tool-pick").forEach(b => b.onclick = () => b.classList.toggle("active"));
+
+    document.getElementById("join-form").onsubmit = e => {
+      e.preventDefault();
+      const tools = [...box.querySelectorAll(".tool-pick.active")].map(b => b.dataset.tool);
+      if (!tools.length) { box.style.outline = "1px solid var(--danger)"; return; }
+      try {
+        const apps = JSON.parse(localStorage.getItem("medium_seer_apps") || "[]");
+        apps.unshift({
+          name: document.getElementById("jf-name").value.trim(),
+          tools, exp: +document.getElementById("jf-exp").value,
+          contact: document.getElementById("jf-contact").value.trim(),
+          bio: document.getElementById("jf-bio").value.trim(),
+          at: new Date().toISOString()
+        });
+        localStorage.setItem("medium_seer_apps", JSON.stringify(apps.slice(0, 5)));
+      } catch (err) { /* private mode: แสดงหน้าสำเร็จได้ตามปกติ */ }
+      document.getElementById("join-form").hidden = true;
+      document.getElementById("join-done").hidden = false;
+    };
+  </script>
+</body>
+</html>

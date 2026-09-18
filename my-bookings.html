@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>การจองของฉัน — นัดดูดวง ยกเลิก เลื่อนนัด รีวิว | Medium</title>
+  <meta name="description" content="ดูนัดดูดวงทั้งหมดของคุณ เลื่อนนัด ยกเลิกพร้อมเงื่อนไขคืนเงิน และให้คะแนนรีวิวหมอดูหลังจบเซสชัน">
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔮</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#12081f">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-page="bookings">
+  <header class="nav" id="app-nav"></header>
+
+  <section class="section container">
+    <div class="section-head">
+      <h2>🗓️ การจอง<span class="em">ของฉัน</span></h2>
+      <p>นัดทั้งหมดของคุณอยู่ที่นี่ — เลื่อนนัด ยกเลิก หรือรีวิวหมอดูหลังจบเซสชัน
+        (ข้อมูลเก็บในเครื่องของคุณเท่านั้น)</p>
+    </div>
+
+    <div id="bk-empty" class="card tc" hidden>
+      <div style="font-size:2.6rem">🔮</div>
+      <h3 class="mt-1">ยังไม่มีการจอง</h3>
+      <p class="muted" style="margin:8px 0 16px">เริ่มดูดวงกับหมอดูตัวจริงครั้งแรกของคุณได้เลย</p>
+      <a href="seers.html" class="btn btn-gold">✨ หาหมอดูที่ใช่</a>
+    </div>
+
+    <div id="sec-upcoming" hidden>
+      <h3 class="dash-sec-title" style="margin-top:0">⏳ นัดที่<span class="em">กำลังจะถึง</span></h3>
+      <div class="grid grid-2" id="list-upcoming"></div>
+    </div>
+
+    <div id="sec-past" hidden>
+      <h3 class="dash-sec-title">✅ เซสชันที่<span class="em">ผ่านมา</span></h3>
+      <div class="grid grid-2" id="list-past"></div>
+    </div>
+
+    <div id="sec-cancelled" hidden>
+      <h3 class="dash-sec-title">🚫 ที่<span class="em">ยกเลิกแล้ว</span></h3>
+      <div class="grid grid-2" id="list-cancelled"></div>
+    </div>
+
+    <p class="muted tc mt-4" style="font-size:.8rem">
+      นโยบายคืนเงิน: ยกเลิกก่อนถึงนัดเกิน 24 ชม. คืนเงินเต็มจำนวนเข้าช่องทางเดิม ·
+      ต่ำกว่า 24 ชม. ติดต่อทีมงานเพื่อพิจารณาเป็นรายกรณี · ดูรายละเอียดใน
+      <a href="terms.html" class="gold">เงื่อนไขการใช้งาน</a></p>
+  </section>
+
+  <footer class="footer" id="app-footer"></footer>
+
+  <script src="data/seers.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script>
+    const lsArr = k => { try { return JSON.parse(localStorage.getItem(k)) || []; } catch (e) { return []; } };
+    const lsSet = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* private mode */ } };
+
+    // เติมข้อมูลให้รายการจองรุ่นเก่าที่บันทึกไว้แบบย่อ (มีแค่ seerId/date/time)
+    function normalize(b) {
+      const s = window.SEERS.find(x => x.id === b.seerId) || {};
+      return {
+        id: b.id || (b.at ? Date.parse(b.at) : Math.random()),
+        seerId: b.seerId, seerName: b.seerName || s.name || "หมอดู", seerEmoji: b.seerEmoji || s.emoji || "🔮",
+        craft: b.craft || s.craft || "", date: b.date || "", time: b.time || "",
+        minutes: b.minutes || 30, price: b.price || ((b.minutes || 30) * (s.pricePerMin || 25)),
+        topic: b.topic || "ดวงโดยรวม", tool: b.tool || s.craft || "", files: b.files || [],
+        pay: b.pay || "", status: b.status || "upcoming", at: b.at || ""
+      };
+    }
+    const bookings = () => lsArr("medium_bookings").map(normalize);
+    const saveStatus = (id, patch) => lsSet("medium_bookings",
+      lsArr("medium_bookings").map(b => (normalize(b).id === id ? { ...normalize(b), ...patch } : b)));
+
+    const reviews = () => lsArr("medium_reviews");
+
+    function when(b) { return b.date ? new Date(b.date + "T" + (b.time || "23:59") + ":00") : null; }
+    function isPast(b) { const w = when(b); return !w || w.getTime() < Date.now(); }
+    function hoursLeft(b) { const w = when(b); return w ? (w.getTime() - Date.now()) / 36e5 : 0; }
+
+    function icsFor(b) {
+      const start = when(b) || new Date();
+      const end = new Date(start.getTime() + b.minutes * 60000);
+      const fmt = d => d.getFullYear() + String(d.getMonth() + 1).padStart(2, "0") + String(d.getDate()).padStart(2, "0") +
+        "T" + String(d.getHours()).padStart(2, "0") + String(d.getMinutes()).padStart(2, "0") + "00";
+      const ics = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Medium//TH", "BEGIN:VEVENT",
+        "UID:" + b.id + "@medium", "DTSTART:" + fmt(start), "DTEND:" + fmt(end),
+        "SUMMARY:🔮 นัดดูดวงกับ" + b.seerName,
+        "DESCRIPTION:วิธีพยากรณ์: " + String(b.tool).replace(/[\n,;]/g, " ") + " · เรื่องที่ถาม: " + String(b.topic).replace(/[\n,;]/g, " "),
+        "BEGIN:VALARM", "TRIGGER:-PT30M", "ACTION:DISPLAY", "DESCRIPTION:อีก 30 นาทีถึงนัดดูดวง", "END:VALARM",
+        "END:VEVENT", "END:VCALENDAR"].join("\r\n");
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(new Blob([ics], { type: "text/calendar" }));
+      a.download = "medium-booking.ics";
+      document.body.appendChild(a); a.click(); a.remove();
+    }
+
+    function cardHead(b, badge) {
+      return `
+        <div class="seer-top">
+          <div class="avatar">${b.seerEmoji}</div>
+          <div>
+            <div class="seer-name">${escapeHtml(b.seerName)}</div>
+            <div class="seer-title">${escapeHtml(b.craft)} · ${b.minutes} นาที · ฿${(+b.price).toLocaleString()}</div>
+          </div>
+          <span style="margin-left:auto">${badge}</span>
+        </div>
+        <p class="muted" style="font-size:.85rem;margin:4px 0 0">
+          📆 ${b.date || "-"} เวลา ${b.time || "-"} น.<br>
+          🧰 ${escapeHtml(b.tool)} · 💬 ${escapeHtml(b.topic)}
+          ${b.files.length ? `<br>📎 ${b.files.map(escapeHtml).join(", ")}` : ""}</p>`;
+    }
+
+    function render() {
+      const all = bookings();
+      const up = all.filter(b => b.status === "upcoming" && !isPast(b));
+      const past = all.filter(b => b.status !== "cancelled" && (b.status === "done" || isPast(b)));
+      const cancelled = all.filter(b => b.status === "cancelled");
+      document.getElementById("bk-empty").hidden = all.length > 0;
+      document.getElementById("sec-upcoming").hidden = up.length === 0;
+      document.getElementById("sec-past").hidden = past.length === 0;
+      document.getElementById("sec-cancelled").hidden = cancelled.length === 0;
+
+      // นัดที่กำลังจะถึง
+      document.getElementById("list-upcoming").innerHTML = up.map(b => `
+        <div class="card" data-id="${b.id}">
+          ${cardHead(b, '<span class="badge badge-ok">🔒 เงินพักในระบบ</span>')}
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
+            <a href="session.html" class="btn btn-purple btn-sm">🎥 เข้าเซสชัน</a>
+            <button class="btn btn-ghost btn-sm" data-act="ics">📅 ปฏิทิน</button>
+            <button class="btn btn-ghost btn-sm" data-act="move">🕐 เลื่อนนัด</button>
+            <button class="btn btn-ghost btn-sm" data-act="cancel">❌ ยกเลิก</button>
+          </div>
+          <div class="bk-extra" hidden></div>
+        </div>`).join("");
+
+      // เซสชันที่ผ่านมา + รีวิว
+      const rv = reviews();
+      document.getElementById("list-past").innerHTML = past.map(b => {
+        const r = rv.find(x => x.bookingId === b.id);
+        return `
+        <div class="card" data-id="${b.id}">
+          ${cardHead(b, '<span class="badge">เสร็จสิ้น</span>')}
+          <div style="margin-top:12px">
+            ${r ? `<p class="gold" style="font-size:.9rem">คุณรีวิวแล้ว: ${"★".repeat(r.stars)}${"☆".repeat(5 - r.stars)}</p>
+                   ${r.text ? `<p class="muted" style="font-size:.85rem">"${escapeHtml(r.text)}"</p>` : ""}`
+              : `<p style="font-size:.9rem;margin-bottom:6px">ให้คะแนนเซสชันนี้:</p>
+                 <div class="star-pick" data-stars="0">
+                   ${[1, 2, 3, 4, 5].map(n => `<button class="star-btn" data-n="${n}">☆</button>`).join("")}
+                 </div>
+                 <textarea class="rv-text" rows="2" placeholder="เล่าประสบการณ์ (ไม่บังคับ)..." style="width:100%;margin-top:8px;background:rgba(0,0,0,.3);color:inherit;border:1px solid var(--line);border-radius:10px;padding:8px 12px;font:inherit;font-size:.88rem"></textarea>
+                 <button class="btn btn-gold btn-sm mt-1" data-act="review" disabled>ส่งรีวิว</button>`}
+            <a href="seers.html" class="btn btn-ghost btn-sm" style="margin-left:6px">🔁 จองอีกครั้ง</a>
+          </div>
+        </div>`;
+      }).join("");
+
+      // ยกเลิกแล้ว
+      document.getElementById("list-cancelled").innerHTML = cancelled.map(b => `
+        <div class="card" style="opacity:.7">
+          ${cardHead(b, '<span class="badge">ยกเลิกแล้ว · ' + (b.refund || "คืนเงินแล้ว") + "</span>")}
+        </div>`).join("");
+
+      wire();
+    }
+
+    function wire() {
+      // ปุ่มนัดที่กำลังจะถึง
+      document.querySelectorAll("#list-upcoming .card").forEach(card => {
+        const id = +card.dataset.id;
+        const b = bookings().find(x => x.id === id);
+        const extra = card.querySelector(".bk-extra");
+        card.querySelector('[data-act="ics"]').onclick = () => icsFor(b);
+        card.querySelector('[data-act="move"]').onclick = () => {
+          const today = new Date().toISOString().split("T")[0];
+          extra.hidden = false;
+          extra.innerHTML = `
+            <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:12px;border-top:1px dashed var(--line);padding-top:12px">
+              <input type="date" class="mv-date" min="${today}" value="${b.date}" style="background:rgba(0,0,0,.3);color:inherit;border:1px solid var(--line);border-radius:10px;padding:8px 12px;font:inherit">
+              <select class="mv-time" style="background:rgba(0,0,0,.3);color:inherit;border:1px solid var(--line);border-radius:10px;padding:8px 12px;font:inherit">
+                ${["10:00", "11:00", "13:00", "14:30", "16:00", "18:00", "19:30", "21:00"].map(t => `<option ${t === b.time ? "selected" : ""}>${t}</option>`).join("")}
+              </select>
+              <button class="btn btn-gold btn-sm" data-act="move-save">ยืนยันเลื่อนนัด</button>
+            </div>
+            <p class="muted" style="font-size:.75rem;margin-top:6px">เลื่อนนัดฟรีไม่จำกัดครั้ง หากแจ้งก่อนถึงนัดเกิน 24 ชม. (เดโม: บันทึกทันที)</p>`;
+          extra.querySelector('[data-act="move-save"]').onclick = () => {
+            saveStatus(id, { date: extra.querySelector(".mv-date").value, time: extra.querySelector(".mv-time").value });
+            render();
+          };
+        };
+        card.querySelector('[data-act="cancel"]').onclick = () => {
+          const h = hoursLeft(b);
+          const full = h > 24;
+          extra.hidden = false;
+          extra.innerHTML = `
+            <div style="margin-top:12px;border-top:1px dashed var(--line);padding-top:12px">
+              <p style="font-size:.9rem">${full
+                ? "✅ ยกเลิกได้ — เหลือเวลาเกิน 24 ชม. <b class='gold'>คืนเงินเต็มจำนวน ฿" + (+b.price).toLocaleString() + "</b> เข้าช่องทางเดิมใน 3-5 วันทำการ"
+                : "⚠️ เหลือเวลาไม่ถึง 24 ชม. — ไม่เข้าเงื่อนไขคืนเงินอัตโนมัติ ทีมงานจะติดต่อพิจารณาเป็นรายกรณี"}</p>
+              <div style="display:flex;gap:8px;margin-top:8px">
+                <button class="btn btn-danger btn-sm" data-act="cancel-yes">ยืนยันยกเลิกนัด</button>
+                <button class="btn btn-ghost btn-sm" data-act="cancel-no">เก็บนัดไว้</button>
+              </div>
+            </div>`;
+          extra.querySelector('[data-act="cancel-yes"]').onclick = () => {
+            saveStatus(id, { status: "cancelled", refund: full ? "คืนเงินเต็มจำนวน" : "รอทีมงานติดต่อ" });
+            render();
+          };
+          extra.querySelector('[data-act="cancel-no"]').onclick = () => { extra.hidden = true; extra.innerHTML = ""; };
+        };
+      });
+
+      // รีวิวเซสชันที่ผ่านมา
+      document.querySelectorAll("#list-past .card").forEach(card => {
+        const pick = card.querySelector(".star-pick");
+        if (!pick) return;
+        const btn = card.querySelector('[data-act="review"]');
+        pick.querySelectorAll(".star-btn").forEach(s => s.onclick = () => {
+          const n = +s.dataset.n;
+          pick.dataset.stars = n;
+          pick.querySelectorAll(".star-btn").forEach(x => x.textContent = +x.dataset.n <= n ? "★" : "☆");
+          btn.disabled = false;
+        });
+        btn.onclick = () => {
+          const stars = +pick.dataset.stars;
+          if (!stars) return;
+          lsSet("medium_reviews", [{
+            bookingId: +card.dataset.id, seerId: (bookings().find(x => x.id === +card.dataset.id) || {}).seerId,
+            stars, text: card.querySelector(".rv-text").value.trim(), at: new Date().toISOString()
+          }, ...lsArr("medium_reviews")].slice(0, 50));
+          render();
+        };
+      });
+    }
+
+    render();
+  </script>
+</body>
+</html>
